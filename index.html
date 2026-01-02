@@ -180,10 +180,14 @@
       <i class="ri-earth-line"></i>
       Internet
     </div>
+    <div class="menu-item" onclick="navigate('app/s.html')">
+      <i class="ri-feedback-line"></i>
+      Request/Feedback
+    </div>
   </div>
 
   <!-- Iframe -->
-  <iframe src="app/home.html" id="content-iframe"></iframe>
+  <iframe src="app/h.html" id="content-iframe"></iframe>
 
   <script>
     const trigger = document.getElementById("menu-trigger");
@@ -192,12 +196,12 @@
     const iframe = document.getElementById("content-iframe");
     const hoverHint = document.getElementById("hover-hint");
 
-    if (window.location.pathname.endsWith("/home.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/index.html")) {
+    if (window.location.pathname.endsWith("/h.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/index.html")) {
       hoverHint.classList.add("visible");
     }
 
     trigger.addEventListener("click", () => {
-      iframe.src = "https://4texas4.github.io/zenith/app/home.html";
+      iframe.src = "https://4texas4.github.io/zenith/app/h.html";
       hideMenu();
     });
 
