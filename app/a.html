@@ -9,34 +9,30 @@
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
   html, body { height:100%; }
 
-/* ensure there is only one scrollbar:
-   - hide any scroll on html
-   - let body handle vertical scrolling only
-   - prevent horizontal scrolling anywhere
-*/
+  /* Single scrollbar setup */
   html { overflow: hidden; }
   body {
     height:100%;
-    overflow-y: auto;         /* single vertical scrollbar on body */
-    overflow-x: hidden;       /* no horizontal scroll */
+    overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    min-width: 0;             /* prevent child elements from forcing overflow */
+    min-width: 0;
     background: linear-gradient(to bottom,#0d47a1,#0b1f5e);
     display:flex;
     flex-direction:column;
     align-items:center;
     color:#cfd8dc;
     position:relative;
-    padding:40px 20px 110px;  /* bottom space for sticky footer */
+    padding:40px 20px 110px; /* bottom space for sticky footer */
   }
 
-  /* Moving grid background (fixed so it doesn't cause extra scroll) */
+  /* Moving grid background */
   body::before{
     content:'';
-    position:fixed;         /* FIXED prevents it from increasing page height */
+    position:fixed;
     top:0; left:0;
     width:200%; height:200%;
-    pointer-events:none;    /* clickable elements not blocked */
+    pointer-events:none;
     background-image:
       linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
@@ -104,20 +100,19 @@
     align-items:center;
     text-align:center;
     padding:8px;
-    min-height:0; /* prevents inflexible child sizing */
+    min-height:0;
   }
   .game-card:hover{
     transform:translateY(-8px);
     box-shadow:0 10px 30px rgba(0,150,255,0.28);
   }
 
-  /* Image is always square */
   .game-card img{
     width:100%;
-    aspect-ratio:1 / 1; /* enforce 1:1 */
+    aspect-ratio:1 / 1;
     object-fit:cover;
     border-radius:12px;
-    margin-bottom:6px; /* less space above title */
+    margin-bottom:6px;
     display:block;
   }
   .game-card span{
@@ -132,7 +127,7 @@
     max-width:100%;
   }
 
-  /* Sticky frosted footer (always visible) */
+  /* Footer */
   footer{
     position:fixed;
     bottom:0;
@@ -183,7 +178,7 @@
     footer { font-size:1rem; gap:14px; padding:8px 6px; }
   }
 
-  /* optional: nice thin custom scrollbar (only visible in browsers that support it) */
+  /* optional scrollbar */
   body::-webkit-scrollbar { width:10px; }
   body::-webkit-scrollbar-track { background:transparent; }
   body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius:10px; }
@@ -211,7 +206,6 @@
   </footer>
 
 <script>
-  // ---- paste your CSV-style list here (title, imageURL, gameLink) ----
   const rawGameList = `
 Cloud Moon, https://4texas4.github.io/media/toolsimages/cloudmoon.png, https://web.cloudmoonapp.com/
 Unb10ck3r$, https://4texas4.github.io/media/toolsimages/unblocked.png, https://4texas4.github.io/zenith/tools/unbl0ck3rs.html
@@ -231,77 +225,81 @@ Internet Archive, https://4texas4.github.io/media/toolsimages/internet-archive.p
 Clock, https://4texas4.github.io/media/toolsimages/clock.png, https://4texas4.github.io/zenith/tools/clock.html
 Emulator, https://4texas4.github.io/media/toolsimages/emulator.png, https://4texas4.github.io/zenith/tools/emu.html
 Random Website, https://4texas4.github.io/media/toolsimages/button.png, https://4texas4.github.io/zenith/tools/random.html
-  `;
+`;
 
-  // parse CSV lines into [title, img, link] safely
-  const tools = rawGameList
+  // proxy setting
+  const useProxy = localStorage.getItem('useProxy') === 'true';
+
+  // parse CSV into [title,img,link]
+  const games = rawGameList
     .trim()
     .split('\n')
     .map(line => {
       const parts = line.split(',');
-      // allow commas inside URLs by joining extras back into the link
       const title = parts[0]?.trim() ?? '';
       const img = parts[1]?.trim() ?? '';
       const link = parts.slice(2).join(',').trim() ?? '';
       return [title, img, link];
     })
-    .filter(item => item[0] && item[2]); // need at least title + link
+    .filter(item => item[0] && item[2]);
 
   const gameGrid = document.getElementById('game-grid');
 
-  // render list
-  function renderTools(list){
+  function renderGames(list){
     gameGrid.innerHTML = '';
     const frag = document.createDocumentFragment();
     list.forEach(([title,img,link])=>{
       const card = document.createElement('div');
-      card.className = 'game-card';
+      card.className='game-card';
       card.setAttribute('role','link');
-      card.tabIndex = 0;
-      card.onclick = ()=> window.location.href = link;
-      card.onkeyup = (e)=> { if(e.key === 'Enter') window.open(link,'_blank'); };
-      card.innerHTML = `<img src="${img}" alt="${title}"><span title="${title}">${title}</span>`;
+      card.tabIndex=0;
+
+      // prepend proxy if enabled
+      const finalLink = useProxy ? `https://tjs65t-8080.csb.app?${link}` : link;
+
+      card.onclick = ()=> window.location.href=finalLink;
+      card.onkeyup = e=>{ if(e.key==='Enter') window.location.href=finalLink; };
+      card.innerHTML=`<img src="${img}" alt="${title}"><span title="${title}">${title}</span>`;
       frag.appendChild(card);
     });
     gameGrid.appendChild(frag);
   }
 
-  renderTools(tools);
+  // render on load
+  renderGames(games);
 
-  // soft search: filter by title
-  const searchInput = document.getElementById('search');
+  // search
+  const searchInput=document.getElementById('search');
   searchInput.addEventListener('input',()=>{
-    const q = searchInput.value.toLowerCase().trim();
-    if(!q){ renderTools(tools); return; }
-    const filtered = tools.filter(([title]) => title.toLowerCase().includes(q));
-    renderTools(filtered);
+    const q=searchInput.value.toLowerCase().trim();
+    if(!q){ renderGames(games); return; }
+    const filtered=games.filter(([title])=>title.toLowerCase().includes(q));
+    renderGames(filtered);
   });
 
-  // Clock (sticky footer)
+  // Clock
   function updateTime(){
-    const now = new Date();
-    let hh = now.getHours();
-    const ampm = hh >= 12 ? 'PM' : 'AM';
-    hh = hh % 12 || 12;
-    const mm = String(now.getMinutes()).padStart(2,'0');
-    const ss = String(now.getSeconds()).padStart(2,'0');
-    document.getElementById('time').innerHTML = `${hh}:${mm}:<span class="seconds">${ss}</span><span class="ampm">${ampm}</span>`;
+    const now=new Date();
+    let hh=now.getHours();
+    const ampm=hh>=12?'PM':'AM';
+    hh=hh%12||12;
+    const mm=String(now.getMinutes()).padStart(2,'0');
+    const ss=String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('time').innerHTML=`${hh}:${mm}:<span class="seconds">${ss}</span><span class="ampm">${ampm}</span>`;
   }
   setInterval(updateTime,1000);
   updateTime();
 
-  // Battery percentage (if available)
-  const batteryText = document.getElementById('battery-text');
-  if (navigator.getBattery) {
-    navigator.getBattery().then(b => {
-      function upd(){ batteryText.textContent = `${Math.round(b.level*100)}%`; }
-      b.addEventListener('levelchange', upd);
-      b.addEventListener('chargingchange', upd);
+  // Battery
+  const batteryText=document.getElementById('battery-text');
+  if(navigator.getBattery){
+    navigator.getBattery().then(b=>{
+      function upd(){ batteryText.textContent=`${Math.round(b.level*100)}%`; }
+      b.addEventListener('levelchange',upd);
+      b.addEventListener('chargingchange',upd);
       upd();
     });
-  } else {
-    batteryText.textContent = 'N/A';
-  }
+  } else batteryText.textContent='N/A';
 </script>
 </body>
 </html>
