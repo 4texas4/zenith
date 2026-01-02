@@ -21,10 +21,10 @@
     /* Top-left trigger */
     #menu-trigger {
       position: fixed;
-      top: 16px;
-      left: 16px;
-      width: 50px;
-      height: 50px;
+      top: 12px;
+      left: 12px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -38,17 +38,17 @@
     }
 
     #menu-trigger svg {
-      width: 35px; /* slightly smaller icon */
-      height: 35px;
+      width: 28px;
+      height: 28px;
     }
 
     /* Hover hint */
     #hover-hint {
       position: fixed;
-      top: 32px; /* tiny bit lower */
-      left: 70px;
+      top: 28px;
+      left: 60px;
       color: rgba(255,255,255,0.8);
-      font-size: 1.1em; /* slightly smaller */
+      font-size: 0.95em;
       font-weight: bold;
       opacity: 0;
       pointer-events: none;
@@ -83,13 +83,13 @@
     /* Menu container */
     #menu-container {
       position: fixed;
-      top: 90px;
-      left: 16px;
+      top: 70px;
+      left: 12px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       opacity: 0;
-      transform: translateY(-20px);
+      transform: translateY(-15px);
       pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
       z-index: 45;
@@ -103,21 +103,22 @@
 
     .menu-item {
       position: relative;
-      padding: 12px 20px;
+      padding: 8px 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 14px;
-      font-size: 1.25em;
+      gap: 10px;
+      font-size: 1em;
       transition: color 0.2s;
       text-align: left;
     }
 
-    .menu-item svg {
-      width: 22px;
-      height: 22px;
+    .menu-item svg, .menu-item i {
+      width: 18px;
+      height: 18px;
       stroke: white;
       flex-shrink: 0;
+      font-size: 18px !important;
     }
 
     /* Rounded rectangle hover effect */
@@ -129,7 +130,7 @@
       top: 0;
       bottom: 0;
       background: rgba(255,255,255,0.1);
-      border-radius: 12px;
+      border-radius: 10px;
       opacity: 0;
       transition: opacity 0.2s;
       z-index: -1;
@@ -168,15 +169,15 @@
   <!-- Menu container -->
   <div id="menu-container">
     <div class="menu-item" onclick="navigate('app/g.html')">
-      <i class="ri-gamepad-line" style="font-size: 24px;"></i>
+      <i class="ri-gamepad-line"></i>
       Games
     </div>
     <div class="menu-item" onclick="navigate('app/a.html')">
-      <i class="ri-apps-line" style="font-size: 24px;"></i>
+      <i class="ri-apps-line"></i>
       Apps
     </div>
     <div class="menu-item" onclick="navigate('https://qzrsdz-8080.csb.app/')">
-      <i class="ri-earth-line" style="font-size: 24px;"></i>
+      <i class="ri-earth-line"></i>
       Internet
     </div>
   </div>
@@ -191,18 +192,15 @@
     const iframe = document.getElementById("content-iframe");
     const hoverHint = document.getElementById("hover-hint");
 
-    // Show hint only on home page
     if (window.location.pathname.endsWith("/home.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/index.html")) {
       hoverHint.classList.add("visible");
     }
 
-    // Logo click updates iframe to home
     trigger.addEventListener("click", () => {
       iframe.src = "https://4texas4.github.io/zenith/app/home.html";
       hideMenu();
     });
 
-    // Toggle menu on hover
     const showMenu = () => {
       overlay.classList.add("active");
       menu.classList.add("active");
@@ -218,7 +216,6 @@
     overlay.addEventListener("click", hideMenu);
     menu.addEventListener("mouseleave", hideMenu);
 
-    // Navigation
     function navigate(url) {
       iframe.src = url;
       hideMenu();
