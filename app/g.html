@@ -540,7 +540,7 @@ Diep, https://4texas4.github.io/media/gameimages/diep.jfif, https://diep.io
       card.className = 'game-card';
       card.setAttribute('role','link');
       card.tabIndex = 0;
-      card.onclick = ()=> window.open(link,'_blank');
+      card.onclick = ()=> window.location.href = link;
       card.onkeyup = (e)=> { if(e.key === 'Enter') window.open(link,'_blank'); };
       card.innerHTML = `<img src="${img}" alt="${title}"><span title="${title}">${title}</span>`;
       frag.appendChild(card);
