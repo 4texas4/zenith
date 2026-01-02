@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zenith</title>
+  <link rel="icon" href="/assets/logo/icon.svg" type="image/svg+xml">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "Inter", sans-serif;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      color: white;
+    }
+
+    /* Top-left trigger */
+    #menu-trigger {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 50;
+      transition: transform 0.3s;
+    }
+
+    #menu-trigger:hover {
+      transform: scale(1.1);
+    }
+
+    #menu-trigger svg {
+      width: 35px; /* slightly smaller icon */
+      height: 35px;
+    }
+
+    /* Hover hint */
+    #hover-hint {
+      position: fixed;
+      top: 32px; /* tiny bit lower */
+      left: 70px;
+      color: rgba(255,255,255,0.8);
+      font-size: 1.1em; /* slightly smaller */
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 49;
+    }
+
+    #hover-hint.visible {
+      opacity: 1;
+    }
+
+    /* Menu overlay */
+    #menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(0px);
+      background-color: rgba(0,0,0,0);
+      transition: backdrop-filter 0.25s ease, background-color 0.25s ease;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    #menu-overlay.active {
+      backdrop-filter: blur(8px);
+      background-color: rgba(0,0,0,0.3);
+      pointer-events: auto;
+    }
+
+    /* Menu container */
+    #menu-container {
+      position: fixed;
+      top: 90px;
+      left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 45;
+    }
+
+    #menu-container.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .menu-item {
+      position: relative;
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 1.25em;
+      transition: color 0.2s;
+      text-align: left;
+    }
+
+    .menu-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: white;
+      flex-shrink: 0;
+    }
+
+    /* Rounded rectangle hover effect */
+    .menu-item::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: -1;
+    }
+
+    .menu-item:hover::after {
+      opacity: 1;
+    }
+
+    /* Iframe */
+    #content-iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Menu trigger -->
+  <div id="menu-trigger">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
+    </svg>
+  </div>
+
+  <!-- Hover hint -->
+  <div id="hover-hint">Hover / tap to open menu</div>
+
+  <!-- Menu overlay -->
+  <div id="menu-overlay"></div>
+
+  <!-- Menu container -->
+  <div id="menu-container">
+    <div class="menu-item" onclick="navigate('app/g.html')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+      Games
+    </div>
+    <div class="menu-item" onclick="navigate('app/a.html')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+      </svg>
+      Apps
+    </div>
+    <div class="menu-item" onclick="navigate('#')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+      Placeholder 1
+    </div>
+    <div class="menu-item" onclick="navigate('#')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+      Placeholder 2
+    </div>
+    <div class="menu-item" onclick="navigate('#')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+      Placeholder 3
+    </div>
+    <div class="menu-item" onclick="navigate('#')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+      Placeholder 4
+    </div>
+    <div class="menu-item" onclick="navigate('#')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+      Placeholder 5
+    </div>
+  </div>
+
+  <!-- Iframe -->
+  <iframe src="https://4texas4.github.io/zenith/app/home.html" id="content-iframe"></iframe>
+
+  <script>
+    const trigger = document.getElementById("menu-trigger");
+    const overlay = document.getElementById("menu-overlay");
+    const menu = document.getElementById("menu-container");
+    const iframe = document.getElementById("content-iframe");
+    const hoverHint = document.getElementById("hover-hint");
+
+    // Show hint only on home page
+    if (window.location.pathname.endsWith("/home.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/index.html")) {
+      hoverHint.classList.add("visible");
+    }
+
+    // Logo click updates iframe to home
+    trigger.addEventListener("click", () => {
+      iframe.src = "https://4texas4.github.io/zenith/app/home.html";
+      hideMenu();
+    });
+
+    // Toggle menu on hover
+    const showMenu = () => {
+      overlay.classList.add("active");
+      menu.classList.add("active");
+      hoverHint.classList.remove("visible");
+    };
+
+    const hideMenu = () => {
+      overlay.classList.remove("active");
+      menu.classList.remove("active");
+    };
+
+    trigger.addEventListener("mouseenter", showMenu);
+    overlay.addEventListener("click", hideMenu);
+    menu.addEventListener("mouseleave", hideMenu);
+
+    // Navigation
+    function navigate(url) {
+      iframe.src = url;
+      hideMenu();
+    }
+  </script>
+</body>
+</html>
