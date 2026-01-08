@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <style>
     :root {
-      --accent-color: #3b82f6; /* Modern Blue */
+      --accent-color: #3b82f6;
       --bg-dark: #0f0f0f;
       --glass-bg: rgba(255, 255, 255, 0.05);
       --glass-border: rgba(255, 255, 255, 0.1);
@@ -25,7 +25,7 @@
       color: white;
     }
 
-    /* Top-left trigger */
+    /* Trigger styling */
     #menu-trigger {
       position: fixed;
       top: 20px;
@@ -35,18 +35,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      cursor: grab; /* Changed to grab */
       z-index: 100;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(10px);
       border-radius: 12px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      user-select: none;
+      touch-action: none; /* Prevents scrolling while dragging on mobile */
+    }
+
+    #menu-trigger:active {
+      cursor: grabbing;
     }
 
     #menu-trigger:hover {
       background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
       border-color: var(--accent-color);
     }
 
@@ -54,9 +59,9 @@
       width: 24px;
       height: 24px;
       transition: transform 0.5s ease;
+      pointer-events: none; /* Ensures the icon doesn't interfere with dragging */
     }
 
-    /* Rotation effect when menu open */
     body.menu-open #menu-trigger svg {
       transform: rotate(180deg);
     }
@@ -65,7 +70,7 @@
     #menu-container {
       position: fixed;
       top: 0;
-      left: -300px; /* Hidden by default */
+      left: -300px;
       width: 280px;
       height: 100vh;
       background: rgba(10, 10, 10, 0.8);
@@ -109,44 +114,22 @@
       transform: translateX(-20px);
     }
 
-    /* Staggered animation for items */
     body.menu-open .menu-item {
       opacity: 1;
       transform: translateX(0);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Delay each item slightly */
     .menu-item:nth-child(2) { transition-delay: 0.1s; }
     .menu-item:nth-child(3) { transition-delay: 0.15s; }
     .menu-item:nth-child(4) { transition-delay: 0.2s; }
     .menu-item:nth-child(5) { transition-delay: 0.25s; }
-    .menu-item:nth-child(6) { transition-delay: 0.3s; }
-    .menu-item:nth-child(7) { transition-delay: 0.35s; }
 
-    .menu-item i {
-      font-size: 20px;
-      transition: transform 0.2s;
-    }
+    .menu-item i { font-size: 20px; transition: transform 0.2s; }
+    .menu-item:hover { background: var(--glass-bg); color: white; padding-left: 22px; }
+    .menu-item:hover i { color: var(--accent-color); transform: scale(1.1); }
+    .menu-item.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); border: 1px solid rgba(59, 130, 246, 0.2); }
 
-    .menu-item:hover {
-      background: var(--glass-bg);
-      color: white;
-      padding-left: 22px;
-    }
-
-    .menu-item:hover i {
-      color: var(--accent-color);
-      transform: scale(1.1);
-    }
-
-    .menu-item.active {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent-color);
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    /* Overlay */
     #menu-overlay {
       position: fixed;
       inset: 0;
@@ -157,12 +140,8 @@
       z-index: 80;
     }
 
-    body.menu-open #menu-overlay {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    body.menu-open #menu-overlay { opacity: 1; pointer-events: auto; }
 
-    /* Iframe */
     #content-iframe {
       position: absolute;
       top: 0;
@@ -174,7 +153,6 @@
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Subtle push effect for iframe when menu opens */
     body.menu-open #content-iframe {
       transform: scale(0.98) translateX(20px);
       border-radius: 20px;
@@ -183,7 +161,7 @@
 </head>
 <body>
 
-  <div id="menu-trigger" onclick="toggleMenu()">
+  <div id="menu-trigger">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
     </svg>
@@ -193,31 +171,15 @@
 
   <nav id="menu-container">
     <div class="menu-section-label">Explore</div>
-    
-    <div class="menu-item" onclick="navigate('app/g.html', this)">
-      <i class="ri-gamepad-line"></i> Games
-    </div>
-    
-    <div class="menu-item" onclick="navigate('app/a.html', this)">
-      <i class="ri-apps-line"></i> Apps
-    </div>
-    
-    <div class="menu-item" onclick="navigate('https://427zkr-8080.csb.app/', this)">
-      <i class="ri-earth-line"></i> Internet
-    </div>
-    
-    <div class="menu-item" onclick="navigate('app/music.html', this)">
-      <i class="ri-soundcloud-fill"></i> Music
-    </div>
+    <div class="menu-item" onclick="navigate('app/g.html', this)"><i class="ri-gamepad-line"></i> Games</div>
+    <div class="menu-item" onclick="navigate('app/a.html', this)"><i class="ri-apps-line"></i> Apps</div>
+    <div class="menu-item" onclick="navigate('https://427zkr-8080.csb.app/', this)"><i class="ri-earth-line"></i> Internet</div>
+    <div class="menu-item" onclick="navigate('app/music.html', this)"><i class="ri-soundcloud-fill"></i> Music</div>
 
     <div style="margin-top: auto; border-top: 1px solid var(--glass-border); padding-top: 20px;">
       <div class="menu-section-label">System</div>
-      <div class="menu-item" onclick="navigate('app/s.html', this)">
-        <i class="ri-feedback-line"></i> Feedback
-      </div>
-      <div class="menu-item" onclick="navigate('app/settings.html', this)">
-        <i class="ri-settings-5-line"></i> Settings
-      </div>
+      <div class="menu-item" onclick="navigate('app/s.html', this)"><i class="ri-feedback-line"></i> Feedback</div>
+      <div class="menu-item" onclick="navigate('app/settings.html', this)"><i class="ri-settings-5-line"></i> Settings</div>
     </div>
   </nav>
 
@@ -226,27 +188,117 @@
   <script>
     const body = document.body;
     const iframe = document.getElementById("content-iframe");
+    const trigger = document.getElementById("menu-trigger");
+
+    let isDragging = false;
+    let startX, startY, initialX, initialY;
+    let hasMoved = false;
 
     function toggleMenu() {
       body.classList.toggle('menu-open');
     }
 
-    // Trigger home when clicking the logo/trigger specifically (optional)
-    document.getElementById("menu-trigger").addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-        navigate('app/h.html');
-    });
-
     function navigate(url, element) {
-      // Update Iframe
       iframe.src = url;
-      
-      // Update Active Class
       document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
       if(element) element.classList.add('active');
-      
-      // Close Menu
       toggleMenu();
+    }
+
+    // --- DRAG LOGIC ---
+
+    trigger.addEventListener('mousedown', startDrag);
+    window.addEventListener('mousemove', drag);
+    window.addEventListener('mouseup', endDrag);
+
+    // Touch support
+    trigger.addEventListener('touchstart', (e) => startDrag(e.touches[0]));
+    window.addEventListener('touchmove', (e) => drag(e.touches[0]));
+    window.addEventListener('touchend', endDrag);
+
+    function startDrag(e) {
+      isDragging = true;
+      hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      initialX = trigger.offsetLeft;
+      initialY = trigger.offsetTop;
+      
+      // Remove transitions during drag for smoothness
+      trigger.style.transition = 'none';
+    }
+
+    function drag(e) {
+      if (!isDragging) return;
+      
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      
+      // If moved more than 5px, it's a drag, not a click
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
+
+      let newX = initialX + dx;
+      let newY = initialY + dy;
+
+      // Keep within viewport bounds
+      newX = Math.max(10, Math.min(newX, window.innerWidth - trigger.offsetWidth - 10));
+      newY = Math.max(10, Math.min(newY, window.innerHeight - trigger.offsetHeight - 10));
+
+      trigger.style.left = newX + 'px';
+      trigger.style.top = newY + 'px';
+    }
+
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+
+      if (!hasMoved) {
+        // If it was just a click, toggle menu
+        toggleMenu();
+      } else {
+        // If it was a drag, snap to closest point
+        snapToGrid();
+      }
+    }
+
+    function snapToGrid() {
+      const padding = 20;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const bw = trigger.offsetWidth;
+      const bh = trigger.offsetHeight;
+
+      // Define possible snap points: [x, y]
+      const points = [
+        [padding, padding], // Top Left
+        [w / 2 - bw / 2, padding], // Top Center
+        [w - bw - padding, padding], // Top Right
+        [padding, h / 2 - bh / 2], // Left Center
+        [w - bw - padding, h / 2 - bh / 2], // Right Center
+        [padding, h - bh - padding], // Bottom Left
+        [w / 2 - bw / 2, h - bh - padding], // Bottom Center
+        [w - bw - padding, h - bh - padding] // Bottom Right
+      ];
+
+      const currentX = parseInt(trigger.style.left);
+      const currentY = parseInt(trigger.style.top);
+
+      // Find point with minimum distance
+      let closest = points[0];
+      let minDist = Infinity;
+
+      points.forEach(p => {
+        const dist = Math.sqrt(Math.pow(p[0] - currentX, 2) + Math.pow(p[1] - currentY, 2));
+        if (dist < minDist) {
+          minDist = dist;
+          closest = p;
+        }
+      });
+
+      // Apply snap with transition
+      trigger.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      trigger.style.left = closest[0] + 'px';
+      trigger.style.top = closest[1] + 'px';
     }
   </script>
 </body>
