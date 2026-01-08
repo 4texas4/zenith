@@ -382,7 +382,7 @@
 
         async function execSearch(query) {
             notify("Searching Cloud...");
-            const res = await fetch(`https://mfqhh5-3000.csb.app/s/${encodeURIComponent(query)}`);
+            const res = await fetch(`https://myn8cr-3000.csb.app/s/${encodeURIComponent(query)}`);
             const data = await res.json();
             const container = document.getElementById('search-results');
             container.innerHTML = '';
@@ -402,7 +402,7 @@
             notify("Resolving Stream...");
 
             if (track.isSpot) {
-                const search = await fetch(`https://mfqhh5-3000.csb.app/s/${encodeURIComponent(track.title + ' ' + track.artist)}`);
+                const search = await fetch(`https://myn8cr-3000.csb.app/s/${encodeURIComponent(track.title + ' ' + track.artist)}`);
                 const sData = await search.json();
                 if (sData.results.length > 0) {
                     track.url = sData.results[0].url;
@@ -414,7 +414,7 @@
 
             try {
                 const path = track.url.replace('https://soundcloud.com/', '');
-                const res = await fetch(`https://mfqhh5-3000.csb.app/d/${path}`);
+                const res = await fetch(`https://myn8cr-3000.csb.app/d/${path}`);
                 const data = await res.json();
                 currentTrackData = data;                
                 audio.src = data.streamUrl;
