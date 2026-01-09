@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zenith Tools</title>
+<title>Zenith Games</title>
 <style>
   /* Reset + base */
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -60,17 +60,17 @@
   /* Search */
   #search-container{
     width:100%;
-    max-width:1200px;
+    max-width:1400px;
     margin-bottom:26px;
     z-index:1;
     position:relative;
   }
   #search{
     width:100%;
-    padding:12px 16px;
+    padding:16px 20px;
     border-radius:12px;
     border:none;
-    font-size:1rem;
+    font-size:1.1rem;
     outline:none;
     background:rgba(255,255,255,0.05);
     color:#cfd8dc;
@@ -78,12 +78,13 @@
   }
   #search::placeholder{ color:rgba(255,255,255,0.5); }
 
-  /* Game grid */
+  /* Game grid - UPDATED FOR BIGGER ICONS */
   .game-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-    gap:18px;
-    max-width:1200px;
+    /* Changed minmax from 180px to 260px for larger items */
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:25px;
+    max-width:1400px;
     width:100%;
     z-index:1;
     position:relative;
@@ -91,7 +92,7 @@
   }
   .game-card{
     background:rgba(255,255,255,0.05);
-    border-radius:16px;
+    border-radius:20px;
     overflow:hidden;
     cursor:pointer;
     transition:transform 0.28s ease, box-shadow 0.28s ease;
@@ -99,28 +100,29 @@
     flex-direction:column;
     align-items:center;
     text-align:center;
-    padding:8px;
+    padding:10px;
     min-height:0;
   }
   .game-card:hover{
     transform:translateY(-8px);
     box-shadow:0 10px 30px rgba(0,150,255,0.28);
+    background:rgba(255,255,255,0.08);
   }
 
   .game-card img{
     width:100%;
     aspect-ratio:1 / 1;
     object-fit:cover;
-    border-radius:12px;
-    margin-bottom:6px;
+    border-radius:16px;
+    margin-bottom:10px;
     display:block;
   }
   .game-card span{
-    font-weight:600;
+    font-weight:700;
     color:#cfd8dc;
-    font-size:0.98rem;
+    font-size:1.1rem;
     padding:4px 6px;
-    line-height:1.1;
+    line-height:1.2;
     white-space:nowrap;
     text-overflow:ellipsis;
     overflow:hidden;
@@ -165,16 +167,17 @@
 
   /* Responsive tweaks */
   @media (max-width:1000px){
-    .game-grid{ gap:14px; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+    /* On tablets/smaller laptops, allow them to get smaller again to fit screen */
+    .game-grid{ gap:18px; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); }
     #search-container{ max-width:940px; }
   }
   @media (max-width:700px){
     h1{ font-size:3rem }
-    .game-grid{ grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
+    .game-grid{ grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); }
   }
   @media (max-width:420px){
     h1{ font-size:2.4rem }
-    .game-grid{ grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
+    .game-grid{ grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
     footer { font-size:1rem; gap:14px; padding:8px 6px; }
   }
 
@@ -206,6 +209,16 @@
   </footer>
 
 <script>
+  // --- CONFIGURATION ---
+  // Any game title listed here will ALWAYS use the proxy, 
+  // regardless of whether the user proxy setting is on or off.
+  const ALWAYS_PROXY = [
+    "Roblox",
+    "Fortnite"
+  ];
+
+  const PROXY_PREFIX = "https://llczzk-8080.csb.app?";
+
   const rawGameList = `
 Cloud Moon, https://4texas4.github.io/media/toolsimages/cloudmoon.png, https://web.cloudmoonapp.com/
 Unb10ck3r$, https://4texas4.github.io/media/toolsimages/unblocked.png, https://4texas4.github.io/zenith/tools/unbl0ck3rs.html
@@ -225,7 +238,7 @@ Emulator, https://4texas4.github.io/media/toolsimages/emulator.png, https://4tex
 Random Website, https://4texas4.github.io/media/toolsimages/button.png, https://4texas4.github.io/zenith/tools/random.html
 `;
 
-  // proxy setting
+  // Global proxy setting (from local storage)
   const useProxy = localStorage.getItem('useProxy') === 'true';
 
   // parse CSV into [title,img,link]
@@ -246,20 +259,34 @@ Random Website, https://4texas4.github.io/media/toolsimages/button.png, https://
   function renderGames(list){
     gameGrid.innerHTML = '';
     const frag = document.createDocumentFragment();
-    list.forEach(([title,img,link])=>{
+    
+    list.forEach(([title, img, link]) => {
       const card = document.createElement('div');
-      card.className='game-card';
+      card.className = 'game-card';
       card.setAttribute('role','link');
-      card.tabIndex=0;
+      card.tabIndex = 0;
 
-      // prepend proxy if enabled
-      const finalLink = useProxy ? `https://llczzk-8080.csb.app?${link}` : link;
+      // --- PROXY LOGIC ---
+      // 1. Check if global proxy is ON OR if game is in the forced list
+      const shouldProxy = useProxy || ALWAYS_PROXY.includes(title);
+      
+      let finalLink = link;
 
-      card.onclick = ()=> window.location.href=finalLink;
-      card.onkeyup = e=>{ if(e.key==='Enter') window.location.href=finalLink; };
-      card.innerHTML=`<img src="${img}" alt="${title}"><span title="${title}">${title}</span>`;
+      if (shouldProxy) {
+        // 2. Check if the link is ALREADY proxied (to prevent double proxying like https://proxy?https://proxy?url)
+        // Some links in your CSV already have the proxy hardcoded.
+        if (!link.includes('llczzk-8080.csb.app')) {
+          finalLink = `${PROXY_PREFIX}${link}`;
+        }
+      }
+
+      card.onclick = () => window.location.href = finalLink;
+      card.onkeyup = e => { if(e.key === 'Enter') window.location.href = finalLink; };
+      
+      card.innerHTML = `<img src="${img}" alt="${title}"><span title="${title}">${title}</span>`;
       frag.appendChild(card);
     });
+    
     gameGrid.appendChild(frag);
   }
 
