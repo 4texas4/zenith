@@ -35,7 +35,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: grab; /* Changed to grab */
+      cursor: pointer; /* Default cursor when closed */
       z-index: 100;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
@@ -43,10 +43,15 @@
       border-radius: 12px;
       transition: background 0.3s, border-color 0.3s, transform 0.2s;
       user-select: none;
-      touch-action: none; /* Prevents scrolling while dragging on mobile */
+      touch-action: none;
     }
 
-    #menu-trigger:active {
+    /* Change cursor to grab only when menu is open */
+    body.menu-open #menu-trigger {
+      cursor: grab;
+    }
+
+    body.menu-open #menu-trigger:active {
       cursor: grabbing;
     }
 
@@ -59,7 +64,7 @@
       width: 24px;
       height: 24px;
       transition: transform 0.5s ease;
-      pointer-events: none; /* Ensures the icon doesn't interfere with dragging */
+      pointer-events: none;
     }
 
     body.menu-open #menu-trigger svg {
@@ -212,12 +217,17 @@
     window.addEventListener('mousemove', drag);
     window.addEventListener('mouseup', endDrag);
 
-    // Touch support
     trigger.addEventListener('touchstart', (e) => startDrag(e.touches[0]));
     window.addEventListener('touchmove', (e) => drag(e.touches[0]));
     window.addEventListener('touchend', endDrag);
 
     function startDrag(e) {
+      // Logic: Only allow dragging if the menu is already open
+      if (!body.classList.contains('menu-open')) {
+        isDragging = false;
+        return; 
+      }
+
       isDragging = true;
       hasMoved = false;
       startX = e.clientX;
@@ -225,7 +235,6 @@
       initialX = trigger.offsetLeft;
       initialY = trigger.offsetTop;
       
-      // Remove transitions during drag for smoothness
       trigger.style.transition = 'none';
     }
 
@@ -235,13 +244,11 @@
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
       
-      // If moved more than 5px, it's a drag, not a click
       if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
 
       let newX = initialX + dx;
       let newY = initialY + dy;
 
-      // Keep within viewport bounds
       newX = Math.max(10, Math.min(newX, window.innerWidth - trigger.offsetWidth - 10));
       newY = Math.max(10, Math.min(newY, window.innerHeight - trigger.offsetHeight - 10));
 
@@ -250,14 +257,18 @@
     }
 
     function endDrag() {
+      // If the menu was closed, this click will still trigger the toggle
+      if (!isDragging && !body.classList.contains('menu-open')) {
+          toggleMenu();
+          return;
+      }
+
       if (!isDragging) return;
       isDragging = false;
 
       if (!hasMoved) {
-        // If it was just a click, toggle menu
         toggleMenu();
       } else {
-        // If it was a drag, snap to closest point
         snapToGrid();
       }
     }
@@ -269,22 +280,20 @@
       const bw = trigger.offsetWidth;
       const bh = trigger.offsetHeight;
 
-      // Define possible snap points: [x, y]
       const points = [
-        [padding, padding], // Top Left
-        [w / 2 - bw / 2, padding], // Top Center
-        [w - bw - padding, padding], // Top Right
-        [padding, h / 2 - bh / 2], // Left Center
-        [w - bw - padding, h / 2 - bh / 2], // Right Center
-        [padding, h - bh - padding], // Bottom Left
-        [w / 2 - bw / 2, h - bh - padding], // Bottom Center
-        [w - bw - padding, h - bh - padding] // Bottom Right
+        [padding, padding],
+        [w / 2 - bw / 2, padding],
+        [w - bw - padding, padding],
+        [padding, h / 2 - bh / 2],
+        [w - bw - padding, h / 2 - bh / 2],
+        [padding, h - bh - padding],
+        [w / 2 - bw / 2, h - bh - padding],
+        [w - bw - padding, h - bh - padding]
       ];
 
       const currentX = parseInt(trigger.style.left);
       const currentY = parseInt(trigger.style.top);
 
-      // Find point with minimum distance
       let closest = points[0];
       let minDist = Infinity;
 
@@ -296,7 +305,6 @@
         }
       });
 
-      // Apply snap with transition
       trigger.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
       trigger.style.left = closest[0] + 'px';
       trigger.style.top = closest[1] + 'px';
