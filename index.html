@@ -35,29 +35,25 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer; /* Default cursor when closed */
-      z-index: 100;
+      cursor: pointer;
+      z-index: 1000;
       background: var(--glass-bg);
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(10px);
       border-radius: 12px;
-      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      /* The 0.1s transition here creates the "little drag" effect when moving */
+      transition: left 0.1s ease-out, top 0.1s ease-out, background 0.3s, border-color 0.3s;
       user-select: none;
       touch-action: none;
     }
 
-    /* Change cursor to grab only when menu is open */
     body.menu-open #menu-trigger {
       cursor: grab;
+      border-color: var(--accent-color);
     }
 
     body.menu-open #menu-trigger:active {
       cursor: grabbing;
-    }
-
-    #menu-trigger:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--accent-color);
     }
 
     #menu-trigger svg {
@@ -86,7 +82,7 @@
       padding: 100px 20px 20px 20px;
       box-sizing: border-box;
       transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 90;
+      z-index: 900;
     }
 
     body.menu-open #menu-container {
@@ -125,27 +121,15 @@
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .menu-item:nth-child(2) { transition-delay: 0.1s; }
-    .menu-item:nth-child(3) { transition-delay: 0.15s; }
-    .menu-item:nth-child(4) { transition-delay: 0.2s; }
-    .menu-item:nth-child(5) { transition-delay: 0.25s; }
+    .menu-item:nth-child(2) { transition-delay: 0.05s; }
+    .menu-item:nth-child(3) { transition-delay: 0.1s; }
+    .menu-item:nth-child(4) { transition-delay: 0.15s; }
+    .menu-item:nth-child(5) { transition-delay: 0.2s; }
 
     .menu-item i { font-size: 20px; transition: transform 0.2s; }
     .menu-item:hover { background: var(--glass-bg); color: white; padding-left: 22px; }
     .menu-item:hover i { color: var(--accent-color); transform: scale(1.1); }
     .menu-item.active { background: rgba(59, 130, 246, 0.1); color: var(--accent-color); border: 1px solid rgba(59, 130, 246, 0.2); }
-
-    #menu-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-      z-index: 80;
-    }
-
-    body.menu-open #menu-overlay { opacity: 1; pointer-events: auto; }
 
     #content-iframe {
       position: absolute;
@@ -162,6 +146,12 @@
       transform: scale(0.98) translateX(20px);
       border-radius: 20px;
     }
+
+    /* CRITICAL FIX: Disable iframe events while dragging 
+       so the mouse doesn't get "lost" inside the iframe */
+    body.is-dragging #content-iframe {
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -171,8 +161,6 @@
       <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
     </svg>
   </div>
-
-  <div id="menu-overlay" onclick="toggleMenu()"></div>
 
   <nav id="menu-container">
     <div class="menu-section-label">Explore</div>
@@ -195,20 +183,41 @@
     const body = document.body;
     const iframe = document.getElementById("content-iframe");
     const trigger = document.getElementById("menu-trigger");
+    const menu = document.getElementById("menu-container");
 
     let isDragging = false;
     let startX, startY, initialX, initialY;
     let hasMoved = false;
+    let closeTimeout;
 
-    function toggleMenu() {
-      body.classList.toggle('menu-open');
+    // --- HOVER LOGIC ---
+
+    function openMenu() {
+      clearTimeout(closeTimeout);
+      body.classList.add('menu-open');
     }
+
+    function closeMenu() {
+      // Small delay so user can move mouse from icon to menu without it closing
+      closeTimeout = setTimeout(() => {
+        // Don't close if we are currently dragging
+        if (!isDragging) {
+          body.classList.remove('menu-open');
+        }
+      }, 300);
+    }
+
+    trigger.addEventListener('mouseenter', openMenu);
+    trigger.addEventListener('mouseleave', closeMenu);
+    
+    menu.addEventListener('mouseenter', openMenu);
+    menu.addEventListener('mouseleave', closeMenu);
 
     function navigate(url, element) {
       iframe.src = url;
       document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
       if(element) element.classList.add('active');
-      toggleMenu();
+      body.classList.remove('menu-open');
     }
 
     // --- DRAG LOGIC ---
@@ -222,25 +231,28 @@
     window.addEventListener('touchend', endDrag);
 
     function startDrag(e) {
-      // Logic: Only allow dragging if the menu is already open
-      if (!body.classList.contains('menu-open')) {
-        isDragging = false;
-        return; 
-      }
+      // Only drag if the menu is already open
+      if (!body.classList.contains('menu-open')) return;
 
       isDragging = true;
+      body.classList.add('is-dragging'); // Adds the pointer-events fix
+      
       hasMoved = false;
       startX = e.clientX;
       startY = e.clientY;
       initialX = trigger.offsetLeft;
       initialY = trigger.offsetTop;
       
-      trigger.style.transition = 'none';
+      // We set a very short transition to create the "lag" effect you wanted
+      trigger.style.transition = 'left 0.08s ease-out, top 0.08s ease-out';
+      
+      clearTimeout(closeTimeout); 
     }
 
     function drag(e) {
       if (!isDragging) return;
       
+      // Calculate delta
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
       
@@ -249,6 +261,7 @@
       let newX = initialX + dx;
       let newY = initialY + dy;
 
+      // Keep within bounds
       newX = Math.max(10, Math.min(newX, window.innerWidth - trigger.offsetWidth - 10));
       newY = Math.max(10, Math.min(newY, window.innerHeight - trigger.offsetHeight - 10));
 
@@ -257,20 +270,15 @@
     }
 
     function endDrag() {
-      // If the menu was closed, this click will still trigger the toggle
-      if (!isDragging && !body.classList.contains('menu-open')) {
-          toggleMenu();
-          return;
-      }
-
       if (!isDragging) return;
       isDragging = false;
+      body.classList.remove('is-dragging');
 
-      if (!hasMoved) {
-        toggleMenu();
-      } else {
-        snapToGrid();
-      }
+      snapToGrid();
+      
+      // Check if we need to close the menu (if mouse is not over trigger or menu)
+      // We trigger the close logic, but 'mouseenter' on the icon/menu will cancel it if we landed there.
+      closeMenu();
     }
 
     function snapToGrid() {
@@ -291,8 +299,8 @@
         [w - bw - padding, h - bh - padding]
       ];
 
-      const currentX = parseInt(trigger.style.left);
-      const currentY = parseInt(trigger.style.top);
+      const currentX = parseInt(trigger.style.left) || padding;
+      const currentY = parseInt(trigger.style.top) || padding;
 
       let closest = points[0];
       let minDist = Infinity;
@@ -305,6 +313,7 @@
         }
       });
 
+      // Reset transition to be slow and bouncy for the snap
       trigger.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
       trigger.style.left = closest[0] + 'px';
       trigger.style.top = closest[1] + 'px';
