@@ -29,254 +29,105 @@
             transition: 0.5s ease;
         }
 
-        /* Lyric Mode Layout Adjustments */
-        body.lyric-mode main {
-            justify-content: flex-start;
-            padding-top: 40px;
-        }
-
-        body.lyric-mode #art-zone {
-            width: 140px;
-            height: 140px;
-            margin-bottom: 20px;
-            min-height: 140px; /* Ensures it stays a square */
-        }
-
+        body.lyric-mode main { justify-content: flex-start; padding-top: 40px; }
+        body.lyric-mode #art-zone { width: 140px; height: 140px; margin-bottom: 20px; min-height: 140px; }
         body.lyric-mode .track-meta h1 { font-size: 1.8rem; }
         body.lyric-mode .player-controls { max-width: 450px; margin-bottom: 10px; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
         #bg-blur {
-            position: fixed;
-            inset: -50px;
-            z-index: -1;
-            background-size: cover;
-            background-position: center;
+            position: fixed; inset: -50px; z-index: -1;
+            background-size: cover; background-position: center;
             filter: blur(60px) brightness(0.4);
             transition: background-image 1.2s cubic-bezier(0.4, 0, 0.2, 1);
             transform: scale(1.1);
         }
 
-        #bg-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
-        }
+        #bg-overlay { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%); }
 
-        /* SIDEBAR & QUEUE (Restored to original small style) */
         #sidebar {
-            width: 400px;
-            background: var(--glass-heavy);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
+            width: 400px; background: var(--glass-heavy);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border-right: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            z-index: 10;
+            display: flex; flex-direction: column; z-index: 10;
         }
 
-        .sidebar-header {
-            padding: 40px 30px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #queue-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 20px;
-        }
+        .sidebar-header { padding: 40px 30px 20px; display: flex; justify-content: space-between; align-items: center; }
+        #queue-list { flex: 1; overflow-y: auto; padding: 10px 20px; }
 
         .q-row {
-            display: flex;
-            align-items: center; 
-            padding: 12px; 
-            border-radius: 16px;
-            margin-bottom: 8px; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            border: 1px solid transparent;
+            display: flex; align-items: center; padding: 12px; border-radius: 16px;
+            margin-bottom: 8px; cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+            position: relative;
         }
         .q-row:hover { background: var(--glass); }
         .q-row.active { background: rgba(29, 185, 84, 0.1); border-color: var(--accent); }
         
-        /* Restored original small artwork size for the queue */
         .q-row img, .q-row .art-placeholder { 
-            width: 52px !important; 
-            height: 52px !important; 
-            border-radius: 10px; 
-            margin-right: 18px; 
-            object-fit: cover;
-            flex-shrink: 0;
+            width: 52px; height: 52px; border-radius: 10px; margin-right: 18px; object-fit: cover; flex-shrink: 0;
         }
 
-        /* MAIN PLAYER */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        .remove-btn {
+            margin-left: auto; background: none; border: none; color: var(--text-dim);
+            font-size: 1.2rem; cursor: pointer; opacity: 0; transition: 0.2s; padding: 10px;
         }
+        .q-row:hover .remove-btn { opacity: 1; }
+        .remove-btn:hover { color: #ff4d4d; }
+
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; position: relative; }
 
         #art-zone {
-    width: 440px;
-    height: 440px;
-    aspect-ratio: 1 / 1; /* Forces square shape */
-    border-radius: 28px;
-    overflow: hidden;
-    box-shadow: 0 50px 100px rgba(0,0,0,0.8);
-    margin-bottom: 40px;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#art-zone img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* This makes sure the art fills the square without stretching */
-    display: block;
-}
+            width: 440px; height: 440px; aspect-ratio: 1 / 1; border-radius: 28px;
+            overflow: hidden; box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            margin-bottom: 40px; background: var(--glass); border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+        }
+        #art-zone img { width: 100%; height: 100%; object-fit: cover; }
 
         .art-placeholder {
-            width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #1a1a1a, #000);
-            color: var(--text-dim);
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a, #000); color: var(--text-dim);
             font-weight: 800; letter-spacing: 4px; font-size: 0.8rem;
         }
 
         .track-meta { text-align: center; margin-bottom: 30px; max-width: 600px; }
-        .track-meta h1 { margin: 0; font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; transition: 0.4s; }
+        .track-meta h1 { margin: 0; font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; }
         .track-meta p { margin: 10px 0 0; color: var(--text-dim); font-size: 1.2rem; font-weight: 300; }
 
-        /* LYRICS CONTAINER */
         #lyrics-container {
-            width: 100%;
-            max-width: 800px;
-            height: 40vh;
-            overflow-y: auto;
-            text-align: center;
-            margin-top: 20px;
-            padding: 40px 0;
-            display: none;
+            width: 100%; max-width: 800px; height: 40vh; overflow-y: auto;
+            text-align: center; margin-top: 20px; padding: 40px 0; display: none;
             mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
         }
 
-        .lyric-line {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-dim);
-            margin: 24px 0;
-            transition: all 0.3s;
-            opacity: 0.3;
-            cursor: pointer;
-        }
+        .lyric-line { font-size: 2rem; font-weight: 700; color: var(--text-dim); margin: 24px 0; transition: 0.3s; opacity: 0.3; cursor: pointer; }
+        .lyric-line.active { color: #fff; opacity: 1; transform: scale(1.1); }
 
-        .lyric-line.active {
-            color: #fff;
-            opacity: 1;
-            transform: scale(1.1);
-        }
+        .player-controls { width: 100%; max-width: 550px; }        
+        .timeline { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-size: 0.85rem; color: var(--text-dim); }
+        input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; height: 4px; background: var(--glass-border); border-radius: 2px; }
 
-        /* CONTROLS */
-        .player-controls { width: 100%; max-width: 550px; transition: 0.4s; }        
-        .timeline {
-            display: flex;
-            align-items: center; gap: 15px;
-            margin-bottom: 30px; font-variant-numeric: tabular-nums;
-            font-size: 0.85rem; color: var(--text-dim);
-        }
-
-        input[type="range"] {
-            flex: 1;
-            accent-color: var(--accent); cursor: pointer; height: 4px;
-            background: var(--glass-border); border-radius: 2px;
-        }
-
-        .playback-btns {
-            display: flex;
-            justify-content: center; align-items: center; gap: 40px;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none; color: white; cursor: pointer;
-            font-size: 2.5rem; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .playback-btns { display: flex; justify-content: center; align-items: center; gap: 40px; }
+        .icon-btn { background: none; border: none; color: white; cursor: pointer; font-size: 2.5rem; transition: 0.2s; }
         .icon-btn:hover { color: var(--accent); transform: scale(1.2); }
         .icon-btn.active { color: var(--accent); }
 
-        .action-btn {
-            background: var(--accent);
-            color: #000; border: none;
-            padding: 14px 32px; border-radius: 50px; font-weight: 700;
-            cursor: pointer; transition: 0.3s;
-        }
+        .action-btn { background: var(--accent); color: #000; border: none; padding: 14px 32px; border-radius: 50px; font-weight: 700; cursor: pointer; }
+        .btn-glass { background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 12px 24px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(10px); }
 
-        .btn-glass {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            color: white; padding: 12px 24px; border-radius: 50px; cursor: pointer;
-            backdrop-filter: blur(10px); transition: 0.2s;
-        }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(30px); display: none; z-index: 100; flex-direction: column; align-items: center; }
+        .overlay-content { width: 100%; max-width: 1100px; height: 100vh; display: flex; flex-direction: column; padding: 60px 20px; }
+        .search-bar { width: 100%; background: var(--glass); border: 1px solid var(--glass-border); padding: 22px 35px; border-radius: 100px; color: white; font-size: 1.5rem; outline: none; }
 
-        /* OVERLAYS */
-        .overlay {
-            position: fixed;
-            inset: 0; background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            display: none; z-index: 100; flex-direction: column; align-items: center;
-        }
-
-        .overlay-content {
-            width: 100%;
-            max-width: 1100px; height: 100vh;
-            display: flex; flex-direction: column; padding: 60px 20px;
-        }
-
-        .search-bar {
-            width: 100%;
-            background: var(--glass); border: 1px solid var(--glass-border);
-            padding: 22px 35px; border-radius: 100px; color: white; font-size: 1.5rem;
-            outline: none; transition: 0.3s;
-        }
-
-        #search-results {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 30px; overflow-y: auto; flex: 1; padding-bottom: 40px;
-        }
-
-        .result-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            padding: 20px; border-radius: 24px; cursor: pointer; transition: 0.3s;
-        }
-
+        #search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; overflow-y: auto; flex: 1; padding-bottom: 40px; }
+        .result-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 20px; border-radius: 24px; cursor: pointer; transition: 0.3s; }
         .result-card img { width: 100%; aspect-ratio: 1; border-radius: 16px; object-fit: cover; margin-bottom: 15px; }
 
-        #toast {
-            position: fixed;
-            top: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--accent); color: black; padding: 12px 30px;
-            border-radius: 50px; font-weight: 700; display: none; z-index: 1000;
-        }
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--accent); color: black; padding: 12px 30px; border-radius: 50px; font-weight: 700; display: none; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -365,6 +216,14 @@
         let lyricsData = [];
         let isLyricMode = false;
 
+        // Strictly Alphanumeric + Plus Symbols for Spaces
+        function cleanQuery(str) {
+            return str
+                .replace(/[^a-zA-Z0-9 ]/g, '') 
+                .trim()                        
+                .replace(/\s+/g, '+');        
+        }
+
         async function getToken() {
             const res = await fetch('https://spotify-nu-six.vercel.app/api/token');
             const data = await res.json();
@@ -382,17 +241,20 @@
 
         async function execSearch(query) {
             notify("Searching Cloud...");
-            const res = await fetch(`https://0.4texasplayz4.workers.dev/s/${encodeURIComponent(query)}`);
-            const data = await res.json();
-            const container = document.getElementById('search-results');
-            container.innerHTML = '';
-            data.results.forEach(t => {
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                card.onclick = () => { addToQueue(t); hideOverlays(); };
-                card.innerHTML = `${getArt(t.artwork)}<h4 style="margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${t.title}</h4><p style="margin:5px 0 0; font-size:0.85rem; color:var(--text-dim)">${t.artist}</p>`;
-                container.appendChild(card);
-            });
+            try {
+                const res = await fetch(`https://0.4texasplayz4.workers.dev/s/${cleanQuery(query)}`);
+                const data = await res.json();
+                const results = data.results || data; 
+                const container = document.getElementById('search-results');
+                container.innerHTML = '';
+                results.forEach(t => {
+                    const card = document.createElement('div');
+                    card.className = 'result-card';
+                    card.onclick = () => { addToQueue(t); hideOverlays(); };
+                    card.innerHTML = `${getArt(t.artwork)}<h4 style="margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${t.title}</h4><p style="margin:5px 0 0; font-size:0.85rem; color:var(--text-dim)">${t.artist}</p>`;
+                    container.appendChild(card);
+                });
+            } catch(e) { notify("Search failed"); }
         }
 
         async function playTrack(index) {
@@ -401,57 +263,76 @@
             let track = queue[index];
             notify("Resolving Stream...");
 
+            // Smart Fallback for Spotify Tracks
             if (track.isSpot) {
-                const search = await fetch(`https://0.4texasplayz4.workers.dev/s/${encodeURIComponent(track.title + ' ' + track.artist)}`);
-                const sData = await search.json();
-                if (sData.results.length > 0) {
-                    track.url = sData.results[0].url;
-                    track.artwork = sData.results[0].artwork;
+                // Try Title + Artist first
+                let search = await fetch(`https://0.4texasplayz4.workers.dev/s/${cleanQuery(track.title + ' ' + track.artist)}`);
+                let sData = await search.json();
+                let results = sData.results || sData;
+
+                // Fallback: If no results, try just the Title
+                if (!results || results.length === 0) {
+                    console.log("No match for Title+Artist, falling back to Title only...");
+                    search = await fetch(`https://0.4texasplayz4.workers.dev/s/${cleanQuery(track.title)}`);
+                    sData = await search.json();
+                    results = sData.results || sData;
+                }
+
+                if (results && results.length > 0) {
+                    track.url = results[0].url;
+                    track.artwork = results[0].artwork;
                     track.isSpot = false;
                     save();
-                } else { return alert("Could not find song on SoundCloud"); }
+                } else { 
+                    return alert("Could not find song on SoundCloud"); 
+                }
             }
 
             try {
-                const path = track.url.replace('https://soundcloud.com/', '');
-                const res = await fetch(`https://0.4texasplayz4.workers.dev/d/${path}`);
+                const slug = track.url.replace(/https?:\/\/soundcloud\.com\//, '');
+                const res = await fetch(`https://0.4texasplayz4.workers.dev/d/${slug}`);
                 const data = await res.json();
+                
                 currentTrackData = data;                
                 audio.src = data.streamUrl;
                 document.getElementById('art-zone').innerHTML = getArt(data.artwork);
                 bgBlur.style.backgroundImage = `url(${data.artwork})`;
-                document.getElementById('track-title').innerText = data.song;
+                document.getElementById('track-title').innerText = data.song || data.title;
                 document.getElementById('track-artist').innerText = data.artist;
                 document.getElementById('dl-btn').style.display = 'inline-block';
                 audio.play();
                 document.getElementById('play-btn').innerText = '⏸';
                 updateQueueUI();
                 
-                if (isLyricMode) fetchLyrics(data.artist, data.song);
-            } catch (e) { alert("Playback Error"); }
+                if (isLyricMode) fetchLyrics(data.artist, data.song || data.title);
+            } catch (e) { notify("Playback Error"); }
+        }
+
+        function removeFromQueue(e, index) {
+            e.stopPropagation();
+            queue.splice(index, 1);
+            if (index === currentIndex) {
+                audio.pause();
+                audio.src = '';
+                currentIndex = -1;
+            } else if (index < currentIndex) {
+                currentIndex--;
+            }
+            save();
         }
 
         async function fetchLyrics(artist, title) {
             lyricsContainer.innerHTML = '<p class="lyric-line" style="opacity:1">Searching for lyrics...</p>';
             lyricsData = [];
-            
             const cleanArtist = artist.replace(/\(.*\)|\[.*\]/g, '').trim();
             const cleanTitle = title.replace(/\(.*\)|\[.*\]/g, '').trim();
-
             try {
                 const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(cleanArtist)}&track_name=${encodeURIComponent(cleanTitle)}`);
                 const data = await res.json();
-                
-                if (data.syncedLyrics) {
-                    parseLyrics(data.syncedLyrics);
-                } else if (data.plainLyrics) {
-                    lyricsContainer.innerHTML = data.plainLyrics.split('\n').map(l => `<div class="lyric-line" style="opacity:1">${l}</div>`).join('');
-                } else {
-                    lyricsContainer.innerHTML = '<p class="lyric-line" style="opacity:1">Lyrics not found</p>';
-                }
-            } catch (e) {
-                lyricsContainer.innerHTML = '<p class="lyric-line" style="opacity:1">Unable to load lyrics</p>';
-            }
+                if (data.syncedLyrics) parseLyrics(data.syncedLyrics);
+                else if (data.plainLyrics) lyricsContainer.innerHTML = data.plainLyrics.split('\n').map(l => `<div class="lyric-line" style="opacity:1">${l}</div>`).join('');
+                else lyricsContainer.innerHTML = '<p class="lyric-line" style="opacity:1">Lyrics not found</p>';
+            } catch (e) { lyricsContainer.innerHTML = '<p class="lyric-line" style="opacity:1">Unable to load lyrics</p>'; }
         }
 
         function parseLyrics(lrc) {
@@ -465,7 +346,6 @@
                 }
                 return null;
             }).filter(l => l && l.text);
-
             lyricsContainer.innerHTML = lyricsData.map(l => `<div class="lyric-line" id="${l.id}" onclick="audio.currentTime=${l.time}">${l.text}</div>`).join('');
         }
 
@@ -474,10 +354,7 @@
             document.body.classList.toggle('lyric-mode', isLyricMode);
             lyricsContainer.style.display = isLyricMode ? 'block' : 'none';
             document.getElementById('lyric-btn').classList.toggle('active', isLyricMode);
-            
-            if (isLyricMode && currentTrackData) {
-                fetchLyrics(currentTrackData.artist, currentTrackData.song);
-            }
+            if (isLyricMode && currentTrackData) fetchLyrics(currentTrackData.artist, currentTrackData.song || currentTrackData.title);
         }
 
         audio.ontimeupdate = () => {
@@ -485,13 +362,11 @@
             b.max = audio.duration || 0; b.value = audio.currentTime;
             document.getElementById('time-cur').innerText = formatTime(audio.currentTime);
             document.getElementById('time-dur').innerText = formatTime(audio.duration);
-
             if (isLyricMode && lyricsData.length > 0) {
                 const activeIndex = lyricsData.findIndex((line, i) => {
                     const nextLine = lyricsData[i + 1];
                     return audio.currentTime >= line.time && (!nextLine || audio.currentTime < nextLine.time);
                 });
-
                 if (activeIndex !== -1) {
                     document.querySelectorAll('.lyric-line').forEach(el => el.classList.remove('active'));
                     const activeLine = document.getElementById(lyricsData[activeIndex].id);
@@ -522,32 +397,41 @@
                 const item = document.createElement('div');
                 item.className = `q-row ${i === currentIndex ? 'active' : ''}`;
                 item.onclick = () => playTrack(i);
-                item.innerHTML = `${getArt(t.artwork)}<div style="overflow:hidden"><div style="font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden">${t.title}</div><div style="font-size:0.8rem; color:var(--text-dim)">${t.artist}</div></div>`;
+                item.innerHTML = `
+                    ${getArt(t.artwork)}
+                    <div style="overflow:hidden">
+                        <div style="font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden">${t.title}</div>
+                        <div style="font-size:0.8rem; color:var(--text-dim)">${t.artist} ${t.isSpot ? '• <span style="color:#1db954">Spotify</span>' : ''}</div>
+                    </div>
+                    <button class="remove-btn" onclick="removeFromQueue(event, ${i})">✕</button>
+                `;
                 list.appendChild(item);
             });
         }
 
-async function handleDownload() {
+        async function handleDownload() {
             if (!currentTrackData) return;
             notify("Injecting Metadata...");
             try {
                 const [mp3, art] = await Promise.all([
-                    fetch(currentTrackData.streamUrl).then(r => r.arrayBuffer()),                    fetch(currentTrackData.artwork).then(r => r.arrayBuffer()).catch(() => null)                ]);
+                    fetch(currentTrackData.streamUrl).then(r => r.arrayBuffer()),
+                    fetch(currentTrackData.artwork).then(r => r.arrayBuffer()).catch(() => null)
+                ]);
                 const writer = new ID3Writer(mp3);
-                writer.setFrame('TIT2', currentTrackData.song)
+                writer.setFrame('TIT2', currentTrackData.song || currentTrackData.title)
                       .setFrame('TPE1', [currentTrackData.artist])
-                      .setFrame('TALB', 'SoundCloud');
+                      .setFrame('TALB', 'Zenith Music');
                 if (art) writer.setFrame('APIC', { type: 3, data: art, description: 'Cover' });
                 writer.addTag();
                 const url = URL.createObjectURL(writer.getBlob());
                 const a = document.createElement('a');
-                a.href = url; a.download = `${currentTrackData.song} - ${currentTrackData.artist}.mp3`;
+                a.href = url; a.download = `${currentTrackData.song || currentTrackData.title} - ${currentTrackData.artist}.mp3`;
                 a.click();
                 notify("Download Started!");
             } catch (e) { window.open(currentTrackData.streamUrl); }
         }
 
-async function importSpotify() {
+        async function importSpotify() {
             const url = document.getElementById('spot-url').value;
             const id = url.match(/playlist\/([a-zA-Z0-9]+)/)?.[1];
             if (!id) return alert("Invalid Spotify URL");
@@ -563,17 +447,6 @@ async function importSpotify() {
                 hideOverlays();
             } catch (e) { alert("Import failed. Check if playlist is public."); }
         }
-
-function updateQueueUI() {
-            const list = document.getElementById('queue-list');
-            list.innerHTML = '';
-            queue.forEach((t, i) => {
-                const item = document.createElement('div');
-                item.className = `q-row ${i === currentIndex ? 'active' : ''}`;
-                item.onclick = () => playTrack(i);
-                item.innerHTML = `${getArt(t.artwork)}<div style="overflow:hidden"><div style="font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden">${t.title}</div><div style="font-size:0.8rem; color:var(--text-dim)">${t.artist} ${t.isSpot ? '• <span style="color:#1db954">Spotify</span>' : ''}</div></div>`;
-                list.appendChild(item);
-            });        }
 
         updateQueueUI();
     </script>
