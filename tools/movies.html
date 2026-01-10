@@ -363,19 +363,17 @@
   </div>
 
   <script>
-    /**************** DISCLAIMER FIX ****************/
+    /**************** FIX: INITIALIZATION CONTROL ****************/
     const overlay = document.getElementById('disclaimerOverlay');
     const agreeBtn = document.getElementById('agreeBtn');
-    let siteInitialized = false;
+    let siteInitialized = false; // Block loading until user clicks
 
     agreeBtn.addEventListener('click', () => {
-      // Use CSS class for smooth fade out logic
       overlay.classList.add('hidden');
       
-      // Only initialize once
       if (!siteInitialized) {
         siteInitialized = true;
-        initSite();
+        initSite(); // Only load content NOW
       }
     });
 
@@ -401,10 +399,9 @@
     let currentPage = 1;
     let loading = false;
     let inSearch = false;
-    let annotatedCache = []; // Stores loaded items with certification
+    let annotatedCache = []; 
 
-    /**************** SOURCES (Updated for Blue Theme) ****************/
-    // Replaced brown hex codes (4b3621, c4a484) with Blue/Cyan (00f2ff, 0077b6)
+    /**************** SOURCES ****************/
     const tvSources = [
       'https://player.vidify.top/embed/tv/${id}/${season}/${episode}?autoplay=false&poster=true&chromecast=true&servericon=false&setting=true&pip=true&download=true&font=Roboto&fontcolor=00f2ff&fontsize=20&opacity=0.5&primarycolor=00f2ff&secondarycolor=0077b6&iconcolor=ffffff',
       'https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}',
@@ -520,7 +517,9 @@
     }
 
     async function loadMore() {
-      if (loading || inSearch) return;
+      // FIX: Prevent loading if site isn't initialized yet
+      if (!siteInitialized || loading || inSearch) return;
+      
       loading = true;
       showLoading(true);
       
@@ -529,7 +528,7 @@
           fetchItems('movie', currentPage),
           fetchItems('tv', currentPage)
         ]);
-        const combined = [...movies, ...shows].sort(() => Math.random() - 0.5); // Shuffle slightly
+        const combined = [...movies, ...shows].sort(() => Math.random() - 0.5);
         const annotated = await annotateItems(combined);
         
         renderItems(annotated, true);
@@ -571,16 +570,10 @@
     }
 
     ratingSelect.addEventListener('change', () => {
-      // Re-render current view with new filter
-      const currentItems = inSearch 
-        ? Array.from(main.children).map(c => c._dataItem) // Simplified logic: just re-trigger search or cache
-        : annotatedCache;
-      
       main.innerHTML = '';
       // Re-running renderItems logic on the cache
       annotatedCache.forEach(item => {
          if (certMatchesGroup(item._cert, ratingSelect.value)) {
-           // We duplicate create logic here for brevity or refactor createCard
            const card = document.createElement('div');
            card.className = 'card';
            const img = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : FALLBACK_POSTER;
@@ -589,15 +582,12 @@
            main.appendChild(card);
          }
       });
-      // If in search, we'd need to re-fetch or filter search results specifically, 
-      // but filtering cache works for the main usage.
       if(inSearch) doSearch(searchInput.value);
     });
 
     /**************** MODAL ****************/
     function openModal(item) {
       modal.style.display = 'flex';
-      // Force reflow for transition
       setTimeout(() => modal.classList.add('show'), 10);
       
       modalTitle.textContent = item.title || item.name;
@@ -711,7 +701,7 @@
 
     async function initSite() {
       await loadMore(); // Load page 1
-      await loadMore(); // Load page 2 (fills screen)
+      await loadMore(); // Load page 2
     }
   </script>
 </body>
