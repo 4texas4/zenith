@@ -167,7 +167,7 @@
     <div class="menu-item" onclick="navigate('app/home.html', this)"><i class="ri-home-line"></i> Home</div>
     <div class="menu-item" onclick="navigate('app/play.html', this)"><i class="ri-gamepad-line"></i> Play</div>
     <div class="menu-item" onclick="navigate('app/apps.html', this)"><i class="ri-apps-line"></i> Apps</div>
-    <div class="menu-item" onclick="navigate('https://9s7nfh-8080.csb.app/', this)"><i class="ri-earth-line"></i> Internet</div>
+    <div class="menu-item" id="internetBtn"><i class="ri-earth-line"></i> Internet</div>
     <div class="menu-item" onclick="navigate('app/music.html', this)"><i class="ri-music-line"></i> Music</div>
     <div class="menu-item" onclick="navigate('app/movies.html', this)"><i class="ri-clapperboard-line"></i> Movies</div>
 
@@ -181,6 +181,7 @@
   <iframe src="app/home.html" id="content-iframe"></iframe>
 
   <script>
+    let proxy = "";
     const body = document.body;
     const iframe = document.getElementById("content-iframe");
     const trigger = document.getElementById("menu-trigger");
@@ -319,6 +320,15 @@
       trigger.style.left = closest[0] + 'px';
       trigger.style.top = closest[1] + 'px';
     }
+
+    fetch('https://cdn.jsdelivr.net/gh/4texas4/4texas4.github.io@main/CsbLinkWorking.txt')
+  .then(res => res.text())
+  .then(prefix => {
+    proxy = `https://${prefix.trim()}-8080.csb.app/`;
+    // Set the Internet button click
+    document.getElementById('internetBtn').onclick = () => navigate(proxy, document.getElementById('internetBtn'));
+  })
+  .catch(err => console.error('Failed to load CSB prefix:', err));
   </script>
 </body>
 </html>
