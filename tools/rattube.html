@@ -39,6 +39,37 @@
     #player.active { opacity: 1; pointer-events: auto; }
     #player iframe{ width:100%; height:100%; border:0; }
 
+    .mode-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        display: flex;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 6px;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+    }
+    .mode-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 200ms ease;
+    }
+    .mode-btn.active {
+        background: var(--primary-color);
+        color: #fff;
+    }
+    .mode-btn:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
     .bar-wrap { position:relative; z-index:2; width:min(880px,92%); }
     .bar {
         width:100%; display:flex; align-items:center; gap:12px;
@@ -61,6 +92,13 @@
     .launched .bar { animation: liftAway 820ms forwards; }
     @keyframes liftAway {
         100% { transform: translateY(-140vh); opacity:0; }
+    }
+    .launched .mode-toggle { 
+        animation: fadeOut 820ms forwards; 
+        pointer-events: none;
+    }
+    @keyframes fadeOut {
+        100% { opacity: 0; transform: translateY(-50px); }
     }
     .gone { display:none !important; }
 
@@ -99,6 +137,11 @@
 </style>
 </head>
 <body>
+    <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="embed">Embed</button>
+        <button class="mode-btn" data-mode="scrape">Scrape</button>
+    </div>
+
     <div id="player"><iframe id="ytframe" allow="autoplay; fullscreen"></iframe></div>
 
     <div class="bar-wrap" id="barWrap">
@@ -118,8 +161,22 @@
     const body = document.body, wrap = document.getElementById('barWrap');
     const resultsList = document.getElementById('results'), messageBox = document.getElementById('messageBox');
 
+    // Mode toggle functionality
+    let currentMode = 'embed';
+    const modeButtons = document.querySelectorAll('.mode-btn');
+    
+    modeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modeButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMode = btn.dataset.mode;
+        });
+    });
+
     // Updated API Base
     const SEARCH_API = 'https://vapor.my/worker/watch/yt/search/';
+    const SCRAPE_API = 'https://rvybrtfpovluhazcbnes.supabase.co/functions/v1/youtube-download';
+    const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2eWJydGZwb3ZsdWhhemNibmVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMzc1MjYsImV4cCI6MjA4MzkxMzUyNn0.YVPOXU7B2qrI5OgGcbGaQ_DDNYReoFcOESY9hE6fgx4';
 
     function showMessage(msg) {
         messageBox.textContent = msg;
@@ -141,12 +198,70 @@
         return { query: text };
     }
 
-    function launchPlayer(id){
-        frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
-        body.classList.add('launched');
-        player.classList.add('active');
-        resultsList.innerHTML = '';
-        body.classList.remove('has-results');
+    async function launchPlayer(id){
+        if (currentMode === 'embed') {
+            // Original embed functionality
+            frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+            body.classList.add('launched');
+            player.classList.add('active');
+            resultsList.innerHTML = '';
+            body.classList.remove('has-results');
+        } else {
+            // Scrape mode - get direct video URL
+            showMessage('Getting video stream...');
+            try {
+                const response = await fetch(SCRAPE_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({ url: `https://www.youtube.com/watch?v=${id}` })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                let videoUrl = '';
+                if (data.videoUrl) {
+                    videoUrl = data.videoUrl;
+                } else if (data.medias && data.medias.length > 0) {
+                    const videoFormats = data.medias.filter(media => media.extension === 'mp4' && !media.is_audio);
+                    if (videoFormats.length > 0) {
+                        const bestVideo = videoFormats.reduce((best, current) => {
+                            return (current.height || 0) > (best.height || 0) ? current : best;
+                        });
+                        videoUrl = bestVideo.url;
+                    }
+                }
+
+                if (!videoUrl) {
+                    throw new Error('No video URL found');
+                }
+
+                // Create video element and play fullscreen
+                frame.style.display = 'none';
+                player.innerHTML = `<video controls autoplay style="width:100%;height:100%;object-fit:contain;background:#000;">
+                    <source src="${videoUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>`;
+                
+                body.classList.add('launched');
+                player.classList.add('active');
+                resultsList.innerHTML = '';
+                body.classList.remove('has-results');
+                
+            } catch (error) {
+                showMessage(`Error: ${error.message}`);
+            }
+        }
     }
 
     async function fetchAndRenderResults(query) {
