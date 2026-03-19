@@ -324,7 +324,7 @@
     fetch('https://cdn.jsdelivr.net/gh/4texas4/4texas4.github.io@main/CsbLinkWorking.txt')
   .then(res => res.text())
   .then(prefix => {
-    proxy = `https://${prefix.trim()}-8080.csb.app/`;
+    proxy = `https://proxy.texas-projects.xyz/`;
     // Set the Internet button click
     document.getElementById('internetBtn').onclick = () => navigate(proxy, document.getElementById('internetBtn'));
   })
