@@ -20,7 +20,7 @@ body { font-family: 'Inter', sans-serif; background: #000; color: #fff; display:
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-#bg-blur { position: fixed; inset: -80px; z-index: -2; background-size: cover; background-position: center; filter: blur(80px) brightness(0.88); transform: scale(1.2); transition: background-image 1.4s ease; pointer-events: none; }
+#bg-blur { position: fixed; inset: -80px; z-index: -2; background-size: cover; background-position: center; filter: blur(80px) brightness(1.0); transform: scale(1.2); transition: background-image 1.4s ease; pointer-events: none; }
 #bg-overlay { position: fixed; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
 #toast { position: fixed; top: 22px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--accent); color: #000; padding: 9px 24px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: none; z-index: 9999; opacity: 0; transition: opacity 0.2s, transform 0.2s; white-space: nowrap; }
 #toast.show { display: block; opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -202,6 +202,10 @@ body.lmode .track-meta h1 { font-size: 1.4rem; }
 #fs-play { font-size: 3rem; }
 #fs-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.25); border-radius: 2px; margin: 0 auto 28px; cursor: pointer; }
 
+.fs-menu-item { padding: 14px 18px; font-size: 0.9rem; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid var(--border); }
+.fs-menu-item:last-child { border-bottom: none; }
+.fs-menu-item:hover { background: var(--glass); }
+
 @media (max-width: 768px) {
     #sidebar, main { display: none !important; }
     #mob-main { display: flex; }
@@ -277,6 +281,7 @@ body.lmode .track-meta h1 { font-size: 1.4rem; }
     <div class="xbtns">
       <button class="gbtn" id="d-dl" style="display:none" onclick="doDownload()">⬇ Download</button>
       <button class="gbtn" id="d-addpl" style="display:none" onclick="showAddToPl()">＋ Playlist</button>
+      <button class="gbtn" id="d-switch" style="display:none" onclick="switchSource()">⇄ Switch Source</button>
     </div>
   </div>
 </main>
@@ -318,7 +323,14 @@ body.lmode .track-meta h1 { font-size: 1.4rem; }
     <div id="fs-topbar">
       <button id="fs-close" onclick="closeFs()">✕</button>
       <span id="fs-label">Now Playing</span>
-      <div style="width:36px"></div>
+      <div style="position:relative">
+        <button class="ibtn" style="color:#fff;font-size:1.3rem" onclick="toggleFsMenu()" id="fs-menu-btn">☰</button>
+        <div id="fs-menu" style="display:none;position:absolute;right:0;top:44px;background:#1a1a1a;border:1px solid var(--border);border-radius:14px;overflow:hidden;min-width:180px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
+          <div class="fs-menu-item" onclick="showAddToPl();toggleFsMenu()">＋ Add to Playlist</div>
+          <div class="fs-menu-item" onclick="doDownload();toggleFsMenu()">⬇ Download</div>
+          <div class="fs-menu-item" onclick="switchSource();toggleFsMenu()">⇄ Switch Source</div>
+        </div>
+      </div>
     </div>
     <div id="fs-handle" onclick="closeFs()"></div>
     <div id="fs-content">
@@ -455,6 +467,29 @@ let pendingTrack = null;
 let currentSource = null; // Track which source is actually playing
 let playlists = JSON.parse(localStorage.getItem('z_pls') || '[]');
 let cfg = JSON.parse(localStorage.getItem('z_cfg') || '{"mainSource":"spotify","fallbackSource":"soundcloud","autoplay":true}');
+
+function trackPrefKey(track) {
+    return track.spotifyId || (track.title + '|' + track.artist).toLowerCase();
+}
+async function getSourcePref(track) {
+    const key = trackPrefKey(track);
+    try {
+        const res = await fetch(`${API}/pref/${encodeURIComponent(key)}`);
+        if(!res.ok) return null;
+        const data = await res.json();
+        return data.source || null;
+    } catch { return null; }
+}
+async function setSourcePref(track, source) {
+    const key = trackPrefKey(track);
+    try {
+        await fetch(`${API}/pref/${encodeURIComponent(key)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source })
+        });
+    } catch(e) { console.warn('Failed to save source pref', e); }
+}
 
 // ── NORMALIZE ──
 function normSearch(t) {
@@ -734,7 +769,9 @@ async function playTrack(idx) {
 
     let streamUrl = null;
     let usedSource = null;
-    const trackSource = track.source || cfg.mainSource;
+    // Check if user has a preferred source for this track
+    const savedPref = await getSourcePref(track);
+    const trackSource = savedPref || track.source || cfg.mainSource;
 
     // Try main source first
     if(trackSource === 'spotify' && track.spotifyId) {
@@ -799,6 +836,8 @@ async function playTrack(idx) {
     if(!streamUrl) return notify('Could not find stream');
 
     currentSource = usedSource;
+    // Save which source worked for this track (non-blocking)
+    setSourcePref(track, usedSource);
     curData = {
         title: track.title,
         artist: track.artist,
@@ -873,6 +912,7 @@ function applyTrackUI(d) {
     document.getElementById('d-artist').textContent = artist;
     document.getElementById('d-dl').style.display = 'inline-block';
     document.getElementById('d-addpl').style.display = 'inline-block';
+    document.getElementById('d-switch').style.display = 'inline-block';
 
     // Mobile bg - don't set here, only set when fullscreen opens
 
@@ -1134,6 +1174,63 @@ async function importSpotify() {
         document.getElementById('spot-url').value=''; document.getElementById('spot-name').value='';
         notify(`Imported "${pl.name}" — ${pl.tracks.length} tracks`);
     } catch(e){ console.error(e); notify('Import failed'); }
+}
+
+// ── SWITCH SOURCE ──
+function toggleFsMenu() {
+    const menu = document.getElementById('fs-menu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+// Close menu when clicking outside
+document.addEventListener('click', e => {
+    const menu = document.getElementById('fs-menu');
+    const btn = document.getElementById('fs-menu-btn');
+    if(menu && !menu.contains(e.target) && e.target !== btn) {
+        menu.style.display = 'none';
+    }
+});
+
+async function switchSource() {
+    if(!curData) return notify('Nothing playing');
+    const track = queue[curIdx];
+    const otherSource = curData.source === 'spotify' ? 'soundcloud' : 'spotify';
+    const otherApi = otherSource === 'spotify' ? API : SOUNDCLOUD_API;
+    notify(`Trying ${otherSource}...`);
+
+    try {
+        const res = await fetch(`${otherApi}/s/${cq(curData.title + ' ' + curData.artist)}`);
+        const raw = await res.json();
+        const results = Array.isArray(raw) ? raw : (raw.results || []);
+        if(!results.length) return notify(`Not found on ${otherSource}`);
+
+        const found = normSearch(results[0]);
+        let newStreamUrl = null;
+
+        if(otherSource === 'spotify' && found.spotifyId) {
+            newStreamUrl = `${API}/d/${found.spotifyId}`;
+        } else if(otherSource === 'soundcloud' && found.url) {
+            const slug = found.url.replace(/https?:\/\/soundcloud\.com\//, '');
+            const r2 = await fetch(`${SOUNDCLOUD_API}/d/${slug}`);
+            const d2 = await r2.json();
+            newStreamUrl = d2.streamUrl;
+        }
+
+        if(!newStreamUrl) return notify(`Failed on ${otherSource}`);
+
+        const wasPlaying = !audio.paused;
+        curData.source = otherSource;
+        curData.streamUrl = newStreamUrl;
+        currentSource = otherSource;
+        // Save user's preferred source for this track
+        setSourcePref(queue[curIdx], otherSource);
+        audio.src = newStreamUrl;
+        if(wasPlaying) audio.play().catch(() => notify('Playback failed'));
+        applyTrackUI(curData);
+        notify(`Switched to ${otherSource}`);
+    } catch(e) {
+        console.error(e);
+        notify(`Failed on ${otherSource}`);
+    }
 }
 
 // ── DOWNLOAD ──
