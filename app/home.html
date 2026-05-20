@@ -4,18 +4,26 @@
 <meta charset="utf-8" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap">
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zenith</title>
+<title>Rat Games</title>
 <style>
-  /* Reset */
   * { margin:0; padding:0; box-sizing:border-box; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+
+  :root {
+    --bg-dark: #1a1612;
+    --bg-brown: #2d251e;
+    --accent-tan: #D2B48C;
+    --accent-pink: #FFB6C1;
+    --text-light: #f5f0eb;
+    --text-muted: #a89888;
+  }
 
   body{
     height:100vh;
-    background:linear-gradient(to bottom,#0d47a1,#0b1f5e);
+    background: var(--bg-dark);
     display:flex;
     justify-content:center;
     align-items:center;
-    color:#cfd8dc;
+    color: var(--text-light);
     overflow:hidden;
     position:relative;
   }
@@ -24,43 +32,45 @@
     font-weight: 900;
   }
 
-  /* Moving grid background */
+  /* Rat GIF background */
   body::before{
     content:'';
     position:absolute;
     top:0; left:0;
-    width:200%; height:200%;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size:80px 80px;
-    animation:gridMove 60s linear infinite;
+    width:100%; height:100%;
+    background-image: url('../media/rat.gif');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1;
+    filter: grayscale(30%);
     z-index:0;
   }
-  @keyframes gridMove{0%{background-position:0 0,0 0}100%{background-position:-400px -400px,-400px -400px}}
 
-  /* Title */
-  h1{
-    font-size:8rem;
-    font-weight:700;
-    text-align:center;
+  body::after{
+    content:'';
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: radial-gradient(ellipse at center, transparent 0%, var(--bg-dark) 70%);
+    z-index:0;
+  }
+
+  /* Logo container */
+  .logo-container {
     z-index:1;
     position:relative;
-    animation:float 6s ease-in-out infinite;
-    text-shadow:0 0 10px rgba(255,255,255,0.2),0 0 20px rgba(0,150,255,0.3);
+    animation: float 6s ease-in-out infinite;
+    text-align: center;
   }
+
+  .logo-container img {
+    max-width: 400px;
+    width: 80vw;
+    height: auto;
+    filter: drop-shadow(0 0 20px rgba(210, 180, 140, 0.3));
+  }
+
   @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-15px)}100%{transform:translateY(0)}}
-
-.wave span {
-  display: inline-block;
-  animation: wave 3.5s ease-in-out infinite;
-}
-
-@keyframes wave {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(-15px); }
-  100% { transform: translateY(0); }
-}
 
   /* Footer */
   footer{
@@ -82,12 +92,6 @@
     padding:0 6px;
   }
 
-  /* Even spacing */
-  footer span:nth-child(1){ padding-right:6px; }  /* time -> first divider */
-  footer span:nth-child(2){ padding-left:6px; padding-right:6px; } /* battery */
-  footer span:nth-child(3){ padding-left:6px; } /* discord left side */
-
-  /* Only add divider lines between top-level footer items */
   footer > span:not(:last-child)::after{
     content:'';
     position:absolute;
@@ -96,32 +100,32 @@
     transform:translateY(-50%);
     width:1px;
     height:60%;
-    background:rgba(255,255,255,0.3);
+    background: rgba(210, 180, 140, 0.3);
   }
 
-  a{ color:#cfd8dc; text-decoration:none }
-  a:hover{ text-decoration:underline }
+  a{ color: var(--text-light); text-decoration:none }
+  a:hover{ text-decoration:underline; color: var(--accent-tan); }
 
   /* Clock */
   #time{ display:flex; align-items:center; gap:2px; }
-  .seconds{ color:rgba(255,255,255,0.4); font-weight:400; margin-left:-5px; }
-  .ampm{ color:rgba(255,255,255,0.5); font-size:0.8em; margin-left:-8px; } /* grey AM/PM, no lines */
+  .seconds{ color: var(--text-muted); font-weight:400; margin-left:-5px; }
+  .ampm{ color: var(--text-muted); font-size:0.8em; margin-left:-8px; }
 
   /* Battery */
   .battery{ display:flex; align-items:center; gap:3px; }
-  .battery svg{ width:24px; height:24px; stroke:#cfd8dc; }
+  .battery svg{ width:24px; height:24px; stroke: var(--text-light); }
 
   @media (max-width:600px){
     footer{ flex-direction:column; gap:12px; bottom:10px; font-size:1.1rem }
     footer span:not(:last-child)::after{ display:none }
-    h1{ font-size:4rem }
+    .logo-container img { max-width: 280px; }
   }
-
-
 </style>
 </head>
 <body>
-  <h1 id="wave-title" class="bold">ZENITH</h1>
+  <div class="logo-container">
+    <img src="../media/logo.png" alt="Rat Games" onerror="this.style.display='none'; this.parentElement.innerHTML='<h1 style=\'font-size:8rem; font-weight:900; text-shadow:0 0 10px rgba(210,180,140,0.2),0 0 20px rgba(210,180,140,0.3);\'>RAT GAMES</h1>';">
+  </div>
 
   <footer>
     <span id="time">--:<span class="seconds">--</span><span class="ampm">--</span></span>
@@ -138,12 +142,11 @@
   </footer>
 
 <script>
-  // Clock with 12-hour format and AM/PM
   function updateTime(){
     const now = new Date();
     let hh = now.getHours();
     const ampm = hh >= 12 ? 'PM' : 'AM';
-    hh = hh % 12 || 12; // convert 0 -> 12
+    hh = hh % 12 || 12;
     const mm = String(now.getMinutes()).padStart(2,'0');
     const ss = String(now.getSeconds()).padStart(2,'0');
     document.getElementById('time').innerHTML = `${hh}:${mm}:<span class="seconds">${ss}</span><span class="ampm">${ampm}</span>`;
@@ -151,7 +154,6 @@
   setInterval(updateTime,1000);
   updateTime();
 
-  // Battery percentage
   const batteryText = document.getElementById('battery-text');
   if (navigator.getBattery){
     navigator.getBattery().then(b => {
@@ -161,19 +163,6 @@
       upd();
     });
   } else { batteryText.textContent='N/A'; }
-
-const title = document.getElementById("wave-title");
-  const text = title.textContent;
-  title.textContent = "";
-
-  [...text].forEach((char, i) => {
-    const span = document.createElement("span");
-    span.textContent = char === " " ? "\u00A0" : char;
-    span.style.animationDelay = `${i * 0.12}s`;
-    title.appendChild(span);
-  });
-
-  title.classList.add("wave");
 </script>
 </body>
 </html>

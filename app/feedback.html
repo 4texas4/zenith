@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Feedback</title>
+<title>Rat Games Feedback</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,26 +10,14 @@
 
 <style>
   :root{
-
-    --bg0:#061a2a;   
-    --bg1:#07293f;   
-    --bg2:#0b3c59;   
-
-    --panel: rgba(255,255,255,0.10);
-    --panel2: rgba(255,255,255,0.06);
-    --stroke: rgba(255,255,255,0.16);
-    --stroke2: rgba(255,255,255,0.10);
-
-    --text: rgba(255,255,255,0.92);
-    --muted: rgba(255,255,255,0.68);
-
-    --input: rgba(0,0,0,0.22);
-    --input2: rgba(255,255,255,0.06);
-
-    --accent:#4cc3ff;
-    --accentSoft: rgba(76,195,255,0.18);
-
-    --star-yellow:#ffcc66;
+    --bg-dark: #1a1612;
+    --bg-brown: #2d251e;
+    --accent-tan: #D2B48C;
+    --accent-pink: #FFB6C1;
+    --text-light: #f5f0eb;
+    --text-muted: #a89888;
+    --card-bg: rgba(45, 37, 30, 0.8);
+    --card-border: rgba(210, 180, 140, 0.2);
 
     --ease: cubic-bezier(.18,.98,.22,1);
     --speed: 220ms;
@@ -43,31 +31,29 @@
   body{
     margin:0;
     font-family: Inter, system-ui, Arial, sans-serif;
-    color: var(--text);
+    color: var(--text-light);
     overflow:hidden;
 
     background:
-      radial-gradient(900px 680px at 18% 84%, rgba(76,195,255,0.22), transparent 62%),
-      radial-gradient(900px 680px at 82% 18%, rgba(120,210,255,0.18), transparent 60%),
-      radial-gradient(640px 520px at var(--mx) var(--my), rgba(76,195,255,0.14), transparent 62%),
-      linear-gradient(180deg, var(--bg0), var(--bg1) 55%, var(--bg2));
+      radial-gradient(900px 680px at 18% 84%, rgba(210, 180, 140, 0.15), transparent 62%),
+      radial-gradient(900px 680px at 82% 18%, rgba(255, 182, 193, 0.12), transparent 60%),
+      radial-gradient(640px 520px at var(--mx) var(--my), rgba(210, 180, 140, 0.1), transparent 62%),
+      var(--bg-dark);
   }
 
-  .grid{
-    position:fixed; inset:0; pointer-events:none;
-    opacity:.20;
-    background:
-      repeating-linear-gradient(to right, rgba(255,255,255,.10) 0px, rgba(255,255,255,.10) 1px, transparent 1px, transparent 74px),
-      repeating-linear-gradient(to bottom, rgba(255,255,255,.10) 0px, rgba(255,255,255,.10) 1px, transparent 1px, transparent 74px);
-    mask-image: radial-gradient(circle at 50% 45%, rgba(0,0,0,.92), rgba(0,0,0,.35) 55%, rgba(0,0,0,0) 78%);
-  }
-
-  .grain{
-    position:fixed; inset:0; pointer-events:none;
-    opacity:.10;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
-    background-size: 240px 240px;
+  /* Rat GIF background */
+  body::before{
+    content:'';
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    pointer-events:none;
+    background-image: url('../media/rat.gif');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.08;
+    filter: grayscale(30%);
+    z-index:0;
   }
 
   .wrap{
@@ -77,6 +63,7 @@
     justify-content:center;
     padding: 18px;
     position:relative;
+    z-index: 1;
   }
 
   .panel{
@@ -84,12 +71,12 @@
     max-width: 480px;
     border-radius: 20px;
     padding: 16px;
-    border: 1px solid var(--stroke);
-    background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.07));
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
     box-shadow:
       0 28px 110px rgba(0,0,0,0.55),
-      0 0 0 1px rgba(255,255,255,0.06) inset,
-      0 0 70px rgba(76,195,255,0.12);
+      0 0 0 1px rgba(210, 180, 140, 0.06) inset,
+      0 0 70px rgba(210, 180, 140, 0.08);
     backdrop-filter: blur(18px) saturate(150%);
     -webkit-backdrop-filter: blur(18px) saturate(150%);
     transform: translateY(10px) scale(.98);
@@ -99,20 +86,6 @@
     position:relative;
     overflow:hidden;
   }
-  .panel::before{
-    content:"";
-    position:absolute; inset:-60%;
-    background: conic-gradient(from 120deg,
-      rgba(76,195,255,0.30),
-      rgba(120,210,255,0.18),
-      rgba(255,255,255,0.14),
-      rgba(76,195,255,0.30)
-    );
-    filter: blur(30px);
-    opacity:.55;
-    pointer-events:none;
-  }
-  .panelInner{ position:relative; z-index:2; }
 
   @keyframes popIn{
     to{ opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
@@ -130,12 +103,12 @@
     font-size: 20px;
     letter-spacing: .2px;
     font-weight: 900;
-    color: rgba(255,255,255,0.94);
+    color: var(--accent-tan);
   }
   .sub{
     margin:0;
     font-size: 12.5px;
-    color: var(--muted);
+    color: var(--text-muted);
     line-height: 1.35;
   }
 
@@ -153,27 +126,27 @@
     gap: 10px;
     font-size: 12.5px;
     font-weight: 900;
-    color: rgba(255,255,255,0.84);
+    color: var(--text-light);
     margin-top: 2px;
   }
   label small{
     font-weight: 700;
     font-size: 11.5px;
-    color: rgba(255,255,255,0.62);
+    color: var(--text-muted);
   }
 
   .field{
     border-radius: 16px;
-    border: 1px solid var(--stroke2);
-    background: rgba(0,0,0,0.18);
+    border: 1px solid var(--card-border);
+    background: rgba(0,0,0,0.25);
     box-shadow: 0 18px 46px rgba(0,0,0,0.35);
     overflow:hidden;
     transition: transform var(--speed) var(--ease), border-color var(--speed) var(--ease), background var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
   }
   .field:focus-within{
     transform: translateY(-2px);
-    border-color: rgba(76,195,255,0.45);
-    background: rgba(0,0,0,0.12);
+    border-color: var(--accent-tan);
+    background: rgba(0,0,0,0.18);
     box-shadow: 0 22px 56px rgba(0,0,0,0.44);
   }
 
@@ -183,11 +156,11 @@
     border: 0;
     outline: none;
     background: transparent;
-    color: rgba(255,255,255,0.92);
+    color: var(--text-light);
     font-size: 14px;
     letter-spacing: .1px;
   }
-  input::placeholder, textarea::placeholder{ color: rgba(255,255,255,0.45); }
+  input::placeholder, textarea::placeholder{ color: var(--text-muted); }
   textarea{ height: 110px; resize:none; line-height: 1.35; }
 
   .types{ display:flex; gap: 10px; }
@@ -195,9 +168,9 @@
     flex:1;
     height: 44px;
     border-radius: 999px;
-    border: 1px solid var(--stroke2);
-    background: rgba(0,0,0,0.14);
-    color: rgba(255,255,255,0.72);
+    border: 1px solid var(--card-border);
+    background: rgba(0,0,0,0.2);
+    color: var(--text-muted);
     cursor:pointer;
     font-weight: 900;
     font-size: 13px;
@@ -206,38 +179,26 @@
     position:relative;
     overflow:hidden;
   }
-  .tbtn::before{
-    content:"";
-    position:absolute; inset:-60%;
-    background:
-      radial-gradient(520px 260px at 30% 30%, rgba(76,195,255,0.22), transparent 60%),
-      radial-gradient(520px 260px at 70% 70%, rgba(120,210,255,0.16), transparent 60%);
-    filter: blur(18px);
-    opacity: 0;
-    transition: opacity var(--speed) var(--ease);
-    pointer-events:none;
-  }
-  .tbtn:hover{ transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0,0,0,0.32); }
-  .tbtn:hover::before{ opacity: .65; }
+  .tbtn:hover{ transform: translateY(-2px); box-shadow: 0 14px 34px rgba(0,0,0,0.32); color: var(--text-light); }
 
   .tbtn.active{
-    background: linear-gradient(180deg, rgba(76,195,255,0.22), rgba(0,0,0,0.14));
-    border-color: rgba(76,195,255,0.55);
-    color: rgba(255,255,255,0.92);
-    box-shadow: 0 16px 42px rgba(76,195,255,0.12);
+    background: linear-gradient(180deg, rgba(210, 180, 140, 0.25), rgba(0,0,0,0.14));
+    border-color: var(--accent-tan);
+    color: var(--text-light);
+    box-shadow: 0 16px 42px rgba(210, 180, 140, 0.1);
   }
 
   .starsWrap{
     border-radius: 16px;
-    border: 1px solid var(--stroke2);
-    background: rgba(0,0,0,0.14);
+    border: 1px solid var(--card-border);
+    background: rgba(0,0,0,0.2);
     padding: 10px 10px 12px;
     box-shadow: 0 18px 46px rgba(0,0,0,0.35);
     transition: transform var(--speed) var(--ease), border-color var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
   }
   .starsWrap:hover{
     transform: translateY(-2px);
-    border-color: rgba(76,195,255,0.36);
+    border-color: var(--accent-tan);
     box-shadow: 0 22px 56px rgba(0,0,0,0.44);
   }
   .stars{
@@ -255,16 +216,16 @@
     display:inline-block;
     filter: drop-shadow(0 2px 2px rgba(0,0,0,0.35));
   }
-  .star:hover{ transform: scale(1.14) rotate(-2deg); text-shadow: 0 0 12px rgba(76,195,255,0.22); }
+  .star:hover{ transform: scale(1.14) rotate(-2deg); text-shadow: 0 0 12px rgba(210, 180, 140, 0.22); }
   .star.selected{
-    color: var(--star-yellow);
-    text-shadow: 0 0 16px rgba(255,204,102,0.38);
+    color: var(--accent-tan);
+    text-shadow: 0 0 16px rgba(210, 180, 140, 0.38);
     transform: scale(1.06);
   }
   .ratingHint{
     text-align:center;
     font-size: 12px;
-    color: rgba(255,255,255,0.62);
+    color: var(--text-muted);
     margin-top: 6px;
   }
 
@@ -272,18 +233,18 @@
     width:100%;
     height: 48px;
     border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid rgba(210, 180, 140, 0.3);
     cursor:pointer;
     font-weight: 950;
     letter-spacing: .2px;
     font-size: 15px;
-    color: rgba(0,12,20,0.96);
+    color: var(--bg-dark);
     background:
-      radial-gradient(520px 240px at 30% 30%, rgba(255,255,255,0.20), transparent 60%),
-      linear-gradient(180deg, rgba(76,195,255,0.98), rgba(44,134,199,0.92));
+      radial-gradient(520px 240px at 30% 30%, rgba(255,255,255,0.15), transparent 60%),
+      linear-gradient(180deg, var(--accent-tan), #B89A6B);
     box-shadow:
       0 22px 60px rgba(0,0,0,0.40),
-      0 0 42px rgba(76,195,255,0.20);
+      0 0 42px rgba(210, 180, 140, 0.15);
     transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease), filter var(--speed) var(--ease);
     user-select:none;
     position:relative;
@@ -302,7 +263,7 @@
     filter: saturate(1.05);
     box-shadow:
       0 28px 74px rgba(0,0,0,0.48),
-      0 0 52px rgba(76,195,255,0.24);
+      0 0 52px rgba(210, 180, 140, 0.2);
   }
   .submit:hover::after{ transform: translateX(120%); }
   .submit:active{ transform: translateY(0) scale(.99); }
@@ -316,12 +277,12 @@
   .done strong{
     display:block;
     font-size: 20px;
-    color: rgba(255,255,255,0.94);
+    color: var(--text-light);
     margin-bottom: 8px;
   }
   .done span{
     display:block;
-    color: rgba(255,255,255,0.68);
+    color: var(--text-muted);
     font-size: 13px;
     line-height: 1.4;
     margin-bottom: 14px;
@@ -330,17 +291,17 @@
     height: 44px;
     padding: 0 14px;
     border-radius: 14px;
-    border: 1px solid var(--stroke2);
-    background: rgba(0,0,0,0.14);
-    color: rgba(255,255,255,0.92);
+    border: 1px solid var(--card-border);
+    background: rgba(0,0,0,0.2);
+    color: var(--text-light);
     cursor:pointer;
     font-weight: 900;
     transition: transform var(--speed) var(--ease), border-color var(--speed) var(--ease), background var(--speed) var(--ease), box-shadow var(--speed) var(--ease);
   }
   .doneBtn:hover{
     transform: translateY(-2px) rotate(-1deg);
-    border-color: rgba(76,195,255,0.40);
-    background: rgba(0,0,0,0.10);
+    border-color: var(--accent-tan);
+    background: rgba(0,0,0,0.15);
     box-shadow: 0 14px 36px rgba(0,0,0,0.36);
   }
 
@@ -352,68 +313,62 @@
 </head>
 
 <body>
-  <div class="grid"></div>
-  <div class="grain"></div>
-
   <div class="wrap">
     <div class="panel" id="panel">
-      <div class="panelInner">
-        <div class="header">
-          <h2>Share Your Thoughts</h2>
-          <p class="sub">Quick feedback or a game request — it sends straight to the webhook.</p>
+      <div class="header">
+        <h2>Share Your Thoughts</h2>
+        <p class="sub">Quick feedback or a game request - it sends straight to the webhook.</p>
+      </div>
+
+      <div class="form" id="form">
+        <div>
+          <label for="email">1. Email <small>(optional)</small></label>
+          <div class="field">
+            <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+          </div>
         </div>
 
-        <div class="form" id="form">
-          <div>
-            <label for="email">1. Email <small>(optional)</small></label>
-            <div class="field">
-              <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
-            </div>
+        <div>
+          <label>2. Which one</label>
+          <div class="types" role="tablist" aria-label="Type selector">
+            <button class="tbtn active" data-type="Feedback" type="button">Feedback</button>
+            <button class="tbtn" data-type="Request Game" type="button">Request</button>
           </div>
-
-          <div>
-            <label>2. Which one</label>
-            <div class="types" role="tablist" aria-label="Type selector">
-              <button class="tbtn active" data-type="Feedback" type="button">Feedback</button>
-              <button class="tbtn" data-type="Request Game" type="button">Request</button>
-            </div>
-          </div>
-
-          <div>
-            <label for="message">3. Thoughts</label>
-            <div class="field">
-              <textarea id="message" placeholder="Tell me what you think"></textarea>
-            </div>
-          </div>
-
-          <div>
-            <label>4. Rate <small>(1–5)</small></label>
-            <div class="starsWrap">
-              <div class="stars" id="stars" role="radiogroup" aria-label="Rate 1 to 5">
-                <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="1">★</span>
-                <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="2">★</span>
-                <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="3">★</span>
-                <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="4">★</span>
-                <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="5">★</span>
-              </div>
-              <div class="ratingHint" id="ratingHint">No rating yet</div>
-            </div>
-          </div>
-
-          <button class="submit" id="submitBtn">Submit Feedback</button>
         </div>
 
-        <div class="done" id="done">
-          <strong>We got your request.</strong>
-          <span>Thanks — it’s been sent. You can submit another one if you want.</span>
-          <button class="doneBtn" id="againBtn" type="button">Send another</button>
+        <div>
+          <label for="message">3. Thoughts</label>
+          <div class="field">
+            <textarea id="message" placeholder="Tell me what you think"></textarea>
+          </div>
         </div>
+
+        <div>
+          <label>4. Rate <small>(1-5)</small></label>
+          <div class="starsWrap">
+            <div class="stars" id="stars" role="radiogroup" aria-label="Rate 1 to 5">
+              <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="1">★</span>
+              <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="2">★</span>
+              <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="3">★</span>
+              <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="4">★</span>
+              <span class="star" role="radio" aria-checked="false" tabindex="0" data-value="5">★</span>
+            </div>
+            <div class="ratingHint" id="ratingHint">No rating yet</div>
+          </div>
+        </div>
+
+        <button class="submit" id="submitBtn">Submit Feedback</button>
+      </div>
+
+      <div class="done" id="done">
+        <strong>We got your request.</strong>
+        <span>Thanks - it&apos;s been sent. You can submit another one if you want.</span>
+        <button class="doneBtn" id="againBtn" type="button">Send another</button>
       </div>
     </div>
   </div>
 
 <script>
-
   const root = document.documentElement;
   let raf = 0, nx = innerWidth/2, ny = innerHeight/2;
   function schedule(){
@@ -492,10 +447,10 @@
     const message = (msgEl.value || "").trim();
 
     const payload = {
-      content: "**New Website Feedback**",
+      content: "**New Rat Games Feedback**",
       embeds: [{
         title: selectedType,
-        color: 1084165,
+        color: 13808780, // Tan color
         fields: [
           { name: "Email", value: email || "No email provided" },
           { name: "Message", value: message || "No message" },
@@ -512,9 +467,8 @@
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify(payload)
       });
-    }catch(e){
-
-    }finally{
+    }catch(e){}
+    finally{
       form.style.display = "none";
       done.style.display = "block";
       lockForm(false);

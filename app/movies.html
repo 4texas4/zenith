@@ -3,20 +3,21 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>ZENITH | Multi-Route Interface</title>
+  <title>Rat Games | Movies</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --accent: #00e5ff;
-      --accent-glow: rgba(0, 229, 255, 0.6);
-      --bg-deep: #030405;
-      --bg-surface: #0a0c0e;
-      --bg-elevated: #121518;
-      --text-main: #ffffff;
-      --text-dim: #8b9bb4;
-      --border-light: rgba(255, 255, 255, 0.1);
+      --accent: #D2B48C;
+      --accent-glow: rgba(210, 180, 140, 0.6);
+      --accent-pink: #FFB6C1;
+      --bg-deep: #1a1612;
+      --bg-surface: #2d251e;
+      --bg-elevated: #3d3228;
+      --text-main: #f5f0eb;
+      --text-dim: #a89888;
+      --border-light: rgba(210, 180, 140, 0.15);
       --error-red: #ff4d4d;
     }
 
@@ -38,8 +39,8 @@
       border-bottom: 1px solid var(--border-light);
     }
 
-    .logo { font-size: 1.8rem; font-weight: 900; letter-spacing: 3px; cursor: pointer; flex: 0 0 180px; }
-    .logo span { color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); }
+    .logo { font-size: 1.8rem; font-weight: 900; letter-spacing: 3px; cursor: pointer; flex: 0 0 180px; color: var(--accent); }
+    .logo span { color: var(--accent-pink); text-shadow: 0 0 15px rgba(255, 182, 193, 0.5); }
 
     .search-container { flex: 1; display: flex; justify-content: center; }
     .search-wrapper { position: relative; width: 100%; max-width: 550px; }
@@ -129,7 +130,7 @@
 <body>
 
   <nav class="top-nav">
-    <div class="logo" onclick="location.reload()">ZENITH<span>.</span></div>
+    <div class="logo" onclick="location.reload()">RAT GAMES<span>.</span></div>
     <div class="search-container">
       <div class="search-wrapper">
         <input type="text" id="globalSearch" placeholder="SEARCH THE ARCHIVES..." autocomplete="off">
@@ -140,8 +141,8 @@
 
   <div id="disclaimer">
     <div style="text-align:center;">
-      <h1 style="font-weight:900; font-size: 3rem; margin-bottom: 20px;">ZENITH<span>.</span></h1>
-      <h1 style="font-weight:900; font-size: 1rem; margin-bottom: 20px;">Zenith Movies is simply a wrapper for thrid part media sites. Zenith does NOT host any media.<span>.</span></h1>
+      <h1 style="font-weight:900; font-size: 3rem; margin-bottom: 20px; color: var(--accent);">RAT GAMES<span style="color: var(--accent-pink);">.</span></h1>
+      <h1 style="font-weight:900; font-size: 1rem; margin-bottom: 20px;">Rat Games Movies is simply a wrapper for third party media sites. Rat Games does NOT host any media.<span>.</span></h1>
       <button onclick="init()" class="btn-play">INITIALIZE STREAM</button>
     </div>
   </div>
@@ -177,7 +178,7 @@
     <div class="player-box" id="pBox">
       <div class="player-head">
         <div style="display:flex; align-items:center; gap:15px;">
-            <span id="pTitle" style="font-weight:800; font-size:0.9rem; color:var(--accent);">ZENITH PLAYER</span>
+            <span id="pTitle" style="font-weight:800; font-size:0.9rem; color:var(--accent);">RAT GAMES PLAYER</span>
             <div class="source-switcher">
                 <button id="srcTexas" class="source-btn active" onclick="switchRoute('texas')">TURBO (FAST)</button>
                 <button id="srcVercel" class="source-btn" onclick="switchRoute('vercel')">STABLE (FAILSAFE)</button>
