@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zenith Games</title>
+<style>
+  /* Reset + base */
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  html, body { height:100%; }
+
+  /* Single scrollbar setup */
+  html { overflow: hidden; }
+  body {
+    height:100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    min-width: 0;
+    background: linear-gradient(to bottom,#0d47a1,#0b1f5e);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    color:#cfd8dc;
+    position:relative;
+    padding:40px 20px 110px; /* bottom space for sticky footer */
+  }
+
+  /* Moving grid background */
+  body::before{
+    content:'';
+    position:fixed;
+    top:0; left:0;
+    width:200%; height:200%;
+    pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size:80px 80px;
+    animation:gridMove 60s linear infinite;
+    z-index:0;
+  }
+  @keyframes gridMove{0%{background-position:0 0,0 0}100%{background-position:-400px -400px,-400px -400px}}
+
+  /* Title */
+  h1{
+    font-size:4rem;
+    font-weight:700;
+    text-align:center;
+    z-index:1;
+    position:relative;
+    animation:float 6s ease-in-out infinite;
+    text-shadow:0 0 10px rgba(255,255,255,0.2),0 0 20px rgba(0,150,255,0.3);
+    margin-bottom:20px;
+    max-width: 95%;
+    word-break: break-word;
+  }
+  @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+
+  /* Search */
+  #search-container{
+    width:100%;
+    max-width:1400px;
+    margin-bottom:26px;
+    z-index:1;
+    position:relative;
+  }
+  #search{
+    width:100%;
+    padding:16px 20px;
+    border-radius:12px;
+    border:none;
+    font-size:1.1rem;
+    outline:none;
+    background:rgba(255,255,255,0.05);
+    color:#cfd8dc;
+    box-shadow:0 0 10px rgba(0,0,0,0.3);
+  }
+  #search::placeholder{ color:rgba(255,255,255,0.5); }
+
+  /* Game grid - UPDATED FOR BIGGER ICONS */
+  .game-grid{
+    display:grid;
+    /* Changed minmax from 180px to 260px for larger items */
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:25px;
+    max-width:1400px;
+    width:100%;
+    z-index:1;
+    position:relative;
+    align-items:start;
+  }
+  .game-card{
+    background:rgba(255,255,255,0.05);
+    border-radius:20px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:transform 0.28s ease, box-shadow 0.28s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    padding:10px;
+    min-height:0;
+  }
+  .game-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 10px 30px rgba(0,150,255,0.28);
+    background:rgba(255,255,255,0.08);
+  }
+
+  .game-card img{
+    width:100%;
+    aspect-ratio:1 / 1;
+    object-fit:cover;
+    border-radius:16px;
+    margin-bottom:10px;
+    display:block;
+  }
+  .game-card span{
+    font-weight:700;
+    color:#cfd8dc;
+    font-size:1.1rem;
+    padding:4px 6px;
+    line-height:1.2;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    max-width:100%;
+  }
+
+  /* Footer */
+  footer{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    display:flex;
+    gap:28px;
+    font-size:1.08rem;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    backdrop-filter:blur(12px);
+    background:linear-gradient(rgba(6,10,20,0.45), rgba(6,10,20,0.22));
+    padding:10px 8px;
+    border-top:1px solid rgba(255,255,255,0.04);
+  }
+  footer span{
+    display:flex;
+    align-items:center;
+    position:relative;
+    padding:0 6px;
+  }
+  footer > span:not(:last-child)::after{
+    content:'';
+    position:absolute;
+    right:0;
+    top:50%;
+    transform:translateY(-50%);
+    width:1px;
+    height:60%;
+    background:rgba(255,255,255,0.12);
+  }
+  a{ color:#cfd8dc; text-decoration:none }
+  a:hover{ text-decoration:underline }
+
+  /* Responsive tweaks */
+  @media (max-width:1000px){
+    /* On tablets/smaller laptops, allow them to get smaller again to fit screen */
+    .game-grid{ gap:18px; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); }
+    #search-container{ max-width:940px; }
+  }
+  @media (max-width:700px){
+    h1{ font-size:3rem }
+    .game-grid{ grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); }
+  }
+  @media (max-width:420px){
+    h1{ font-size:2.4rem }
+    .game-grid{ grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
+    footer { font-size:1rem; gap:14px; padding:8px 6px; }
+  }
+
+  /* optional scrollbar */
+  body::-webkit-scrollbar { width:10px; }
+  body::-webkit-scrollbar-track { background:transparent; }
+  body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius:10px; }
+</style>
+</head>
+<body>
+  <h1>Zenith Tools</h1>
+
+  <div id="search-container">
+    <input type="text" id="search" placeholder="Search tools...">
+  </div>
+
+  <div class="game-grid" id="game-grid" aria-live="polite"></div>
+
+  <footer>
+    <span id="time">--:<span class="seconds">--</span><span class="ampm">--</span></span>
+    <span class="battery" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20">
+        <rect x="1" y="6" width="18" height="12" rx="2" ry="2"></rect>
+        <line x1="23" y1="13" x2="23" y2="11"></line>
+      </svg>
+      <span id="battery-text">--%</span>
+    </span>
+    <span><a href="https://discord.gg/6Sp3DJMvCU" target="_blank" rel="noopener">Discord</a></span>
+  </footer>
+
+<script>
+  // --- CONFIGURATION ---
+  // Any game title listed here will ALWAYS use the proxy, 
+  // regardless of whether the user proxy setting is on or off.
+  const ALWAYS_PROXY = [
+  ];
+
+  const PROXY_PREFIX = "https://proxy.texas-projects.xyz/?";
+
+  const rawGameList = `
+Blooket, https://4texas4.github.io/zenith/media/toolsimages/blooket.png, https://4texas4.github.io/zenith/tools/blk2.html
+Cloud Moon, https://4texas4.github.io/zenith/media/toolsimages/cloudmoon.png, https://web.cloudmoonapp.com/
+Unb10ck3r$, https://4texas4.github.io/zenith/media/toolsimages/unblocked.png, https://4texas4.github.io/zenith/tools/unbl0ck3rs.html
+Chat, https://4texas4.github.io/zenith/media/toolsimages/chat.png, https://4texas4.github.io/tools/chat/
+AI, https://4texas4.github.io/zenith/media/toolsimages/ai.png, https://4texas4.github.io/zenith/tools/ai
+AI Image Generator, https://4texas4.github.io/zenith/media/toolsimages/ai-image-generator.jpg, https://4texas4.github.io/zenith/tools/ai-image-generator.html
+Youtube Unbl0ck3d, https://4texas4.github.io/zenith/media/toolsimages/ytunblocked.jpg, https://4texas4.github.io/zenith/tools/rattube.html
+Soundboard, https://4texas4.github.io/zenith/media/toolsimages/soundboard.jpg, https://4texas4.github.io/zenith/tools/soundboard.html
+Code Editor, https://4texas4.github.io/zenith/media/toolsimages/codeeditor.png, https://4texas4.github.io/zenith/tools/codeeditor.html
+Data URL Maker, https://4texas4.github.io/zenith/media/toolsimages/data.png, https://4texas4.github.io/zenith/tools/base.html
+Ewasion, https://4texas4.github.io/zenith/media/toolsimages/ewasion.png, https://4texas4.github.io/zenith/tools/ewasion.html
+Internet Archive, https://4texas4.github.io/zenith/media/toolsimages/internet-archive.png, https://archive.org/
+Clock, https://4texas4.github.io/zenith/media/toolsimages/clock.png, https://4texas4.github.io/zenith/tools/clock.html
+Emulator, https://4texas4.github.io/zenith/media/toolsimages/emulator.png, https://4texas4.github.io/zenith/tools/emu.html
+Random Website, https://4texas4.github.io/zenith/media/toolsimages/button.png, https://4texas4.github.io/zenith/tools/random.html
+`;
+
+  // Global proxy setting (from local storage)
+  const useProxy = localStorage.getItem('useProxy') === 'true';
+
+  // parse CSV into [title,img,link]
+  const games = rawGameList
+    .trim()
+    .split('\n')
+    .map(line => {
+      const parts = line.split(',');
+      const title = parts[0]?.trim() ?? '';
+      const img = parts[1]?.trim() ?? '';
+      const link = parts.slice(2).join(',').trim() ?? '';
+      return [title, img, link];
+    })
+    .filter(item => item[0] && item[2]);
+
+  const gameGrid = document.getElementById('game-grid');
+
+  function renderGames(list){
+    gameGrid.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    
+    list.forEach(([title, img, link]) => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.setAttribute('role','link');
+      card.tabIndex = 0;
+
+      // --- PROXY LOGIC ---
+      // 1. Check if global proxy is ON OR if game is in the forced list
+      const shouldProxy = useProxy || ALWAYS_PROXY.includes(title);
+      
+      let finalLink = link;
+
+      if (shouldProxy) {
+        // 2. Check if the link is ALREADY proxied (to prevent double proxying like https://proxy?https://proxy?url)
+        // Some links in your CSV already have the proxy hardcoded.
+        if (!link.includes('7lzhc6-8080.csb.app')) {
+          finalLink = `${PROXY_PREFIX}${link}`;
+        }
+      }
+
+      card.onclick = () => window.location.href = finalLink;
+      card.onkeyup = e => { if(e.key === 'Enter') window.location.href = finalLink; };
+      
+      card.innerHTML = `<img src="${img}" alt="${title}"><span title="${title}">${title}</span>`;
+      frag.appendChild(card);
+    });
+    
+    gameGrid.appendChild(frag);
+  }
+
+  // render on load
+  renderGames(games);
+
+  // search
+  const searchInput=document.getElementById('search');
+  searchInput.addEventListener('input',()=>{
+    const q=searchInput.value.toLowerCase().trim();
+    if(!q){ renderGames(games); return; }
+    const filtered=games.filter(([title])=>title.toLowerCase().includes(q));
+    renderGames(filtered);
+  });
+
+  // Clock
+  function updateTime(){
+    const now=new Date();
+    let hh=now.getHours();
+    const ampm=hh>=12?'PM':'AM';
+    hh=hh%12||12;
+    const mm=String(now.getMinutes()).padStart(2,'0');
+    const ss=String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('time').innerHTML=`${hh}:${mm}:<span class="seconds">${ss}</span><span class="ampm">${ampm}</span>`;
+  }
+  setInterval(updateTime,1000);
+  updateTime();
+
+  // Battery
+  const batteryText=document.getElementById('battery-text');
+  if(navigator.getBattery){
+    navigator.getBattery().then(b=>{
+      function upd(){ batteryText.textContent=`${Math.round(b.level*100)}%`; }
+      b.addEventListener('levelchange',upd);
+      b.addEventListener('chargingchange',upd);
+      upd();
+    });
+  } else batteryText.textContent='N/A';
+</script>
+</body>
+</html>

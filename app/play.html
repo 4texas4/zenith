@@ -3,20 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Rat Games - Play</title>
+<title>Rat Games | Play</title>
 <style>
-  :root {
-    --bg-dark: #1a1612;
-    --bg-brown: #2d251e;
-    --accent-tan: #D2B48C;
-    --accent-pink: #FFB6C1;
-    --text-light: #f5f0eb;
-    --text-muted: #a89888;
-    --card-bg: rgba(45, 37, 30, 0.6);
-    --card-border: rgba(210, 180, 140, 0.15);
-    --card-hover: rgba(210, 180, 140, 0.25);
-  }
-
   * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
   html, body { height:100%; }
 
@@ -27,41 +15,37 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     min-width: 0;
-    background: var(--bg-dark);
+    background: #1a1612;
     display:flex;
     flex-direction:column;
     align-items:center;
-    color: var(--text-light);
+    color:#f5f0eb;
     position:relative;
     padding:40px 20px 110px;
   }
 
-  /* Rat GIF background */
+  /* Rat gif background */
   body::before{
     content:'';
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
     pointer-events:none;
-    background-image: url('../media/rat.gif');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.08;
-    filter: grayscale(30%);
+    background: url('../media/rat.gif') center center / cover no-repeat;
+    opacity: 0.06;
     z-index:0;
   }
 
-  body::after{
+  body::after {
     content:'';
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
-    pointer-events:none;
-    background: radial-gradient(ellipse at center, transparent 0%, var(--bg-dark) 80%);
+    background: radial-gradient(circle at center, transparent 20%, #1a1612 70%);
     z-index:0;
+    pointer-events:none;
   }
 
-  /* Title */
   h1{
     font-size:4rem;
     font-weight:700;
@@ -73,11 +57,11 @@
     margin-bottom:20px;
     max-width: 95%;
     word-break: break-word;
-    color: var(--accent-tan);
+    color: #D2B48C;
   }
+  h1 .pink { color: #FFB6C1; }
   @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
 
-  /* Search */
   #search-container{
     width:100%;
     max-width:1400px;
@@ -89,53 +73,49 @@
     width:100%;
     padding:16px 20px;
     border-radius:12px;
-    border: 1px solid var(--card-border);
+    border:1px solid rgba(210, 180, 140, 0.2);
     font-size:1.1rem;
     outline:none;
-    background: var(--card-bg);
-    color: var(--text-light);
+    background:rgba(45, 37, 30, 0.5);
+    color:#f5f0eb;
     box-shadow:0 0 10px rgba(0,0,0,0.3);
-    backdrop-filter: blur(10px);
   }
-  #search::placeholder{ color: var(--text-muted); }
-  #search:focus { border-color: var(--accent-tan); }
+  #search:focus {
+    border-color: rgba(210, 180, 140, 0.5);
+    box-shadow: 0 0 20px rgba(210, 180, 140, 0.2);
+  }
+  #search::placeholder{ color:rgba(245, 240, 235, 0.5); }
 
-  /* Switcher */
-  .switcher {
+  /* Tab Switcher */
+  .tab-container {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 26px;
     z-index: 1;
     position: relative;
-    background: var(--card-bg);
-    padding: 6px;
-    border-radius: 12px;
-    border: 1px solid var(--card-border);
   }
-
-  .switcher button {
-    padding: 12px 28px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text-muted);
+  .tab-btn {
+    padding: 12px 32px;
+    border-radius: 100px;
+    border: 1px solid rgba(210, 180, 140, 0.2);
+    background: rgba(45, 37, 30, 0.5);
+    color: rgba(245, 240, 235, 0.7);
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+  }
+  .tab-btn:hover {
+    background: rgba(45, 37, 30, 0.8);
+    border-color: rgba(210, 180, 140, 0.4);
+  }
+  .tab-btn.active {
+    background: #D2B48C;
+    color: #1a1612;
+    border-color: #D2B48C;
+    box-shadow: 0 0 20px rgba(210, 180, 140, 0.3);
   }
 
-  .switcher button.active {
-    background: var(--accent-tan);
-    color: var(--bg-dark);
-  }
-
-  .switcher button:hover:not(.active) {
-    background: rgba(210, 180, 140, 0.15);
-    color: var(--text-light);
-  }
-
-  /* Game grid */
   .game-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -147,25 +127,24 @@
     align-items:start;
   }
   .game-card{
-    background: var(--card-bg);
+    background:rgba(45, 37, 30, 0.5);
     border-radius:20px;
     overflow:hidden;
     cursor:pointer;
-    transition:transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+    transition:transform 0.28s ease, box-shadow 0.28s ease;
     display:flex;
     flex-direction:column;
     align-items:center;
     text-align:center;
     padding:10px;
     min-height:0;
-    border: 1px solid var(--card-border);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(210, 180, 140, 0.1);
   }
   .game-card:hover{
     transform:translateY(-8px);
-    box-shadow:0 10px 30px rgba(210, 180, 140, 0.2);
-    background: var(--card-hover);
-    border-color: var(--accent-tan);
+    box-shadow:0 10px 30px rgba(210, 180, 140, 0.15);
+    background:rgba(45, 37, 30, 0.7);
+    border-color: rgba(210, 180, 140, 0.3);
   }
 
   .game-card img{
@@ -178,7 +157,7 @@
   }
   .game-card span{
     font-weight:700;
-    color: var(--text-light);
+    color:#f5f0eb;
     font-size:1.1rem;
     padding:4px 6px;
     line-height:1.2;
@@ -188,7 +167,6 @@
     max-width:100%;
   }
 
-  /* Footer */
   footer{
     position:fixed;
     bottom:0;
@@ -201,9 +179,9 @@
     justify-content:center;
     z-index:50;
     backdrop-filter:blur(12px);
-    background: linear-gradient(rgba(26, 22, 18, 0.85), rgba(26, 22, 18, 0.7));
+    background:linear-gradient(rgba(26, 22, 18, 0.8), rgba(26, 22, 18, 0.6));
     padding:10px 8px;
-    border-top: 1px solid var(--card-border);
+    border-top:1px solid rgba(210, 180, 140, 0.1);
   }
   footer span{
     display:flex;
@@ -219,12 +197,11 @@
     transform:translateY(-50%);
     width:1px;
     height:60%;
-    background: rgba(210, 180, 140, 0.2);
+    background:rgba(210, 180, 140, 0.2);
   }
-  a{ color: var(--text-light); text-decoration:none }
-  a:hover{ text-decoration:underline; color: var(--accent-tan); }
+  a{ color:#f5f0eb; text-decoration:none }
+  a:hover{ text-decoration:underline; color: #D2B48C; }
 
-  /* Responsive tweaks */
   @media (max-width:1000px){
     .game-grid{ gap:18px; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); }
     #search-container{ max-width:940px; }
@@ -237,25 +214,24 @@
     h1{ font-size:2.4rem }
     .game-grid{ grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; }
     footer { font-size:1rem; gap:14px; padding:8px 6px; }
-    .switcher button { padding: 10px 18px; font-size: 0.9rem; }
+    .tab-btn { padding: 10px 20px; font-size: 0.9rem; }
   }
 
-  /* Scrollbar */
   body::-webkit-scrollbar { width:10px; }
   body::-webkit-scrollbar-track { background:transparent; }
-  body::-webkit-scrollbar-thumb { background: rgba(210, 180, 140, 0.2); border-radius:10px; }
+  body::-webkit-scrollbar-thumb { background: rgba(210, 180, 140, 0.15); border-radius:10px; }
 </style>
 </head>
 <body>
-  <h1>Rat Games</h1>
+  <h1>Rat Games<span class="pink">.</span></h1>
 
   <div id="search-container">
-    <input type="text" id="search" placeholder="Search games & apps...">
+    <input type="text" id="search" placeholder="Search games and apps...">
   </div>
 
-  <div class="switcher">
-    <button id="games-btn" class="active" onclick="switchTab('games')">Games</button>
-    <button id="apps-btn" onclick="switchTab('apps')">Apps</button>
+  <div class="tab-container">
+    <button class="tab-btn active" data-tab="games">Games</button>
+    <button class="tab-btn" data-tab="apps">Apps</button>
   </div>
 
   <div class="game-grid" id="game-grid" aria-live="polite"></div>
@@ -275,11 +251,8 @@
 <script>
   const ALWAYS_PROXY = ["Roblox", "Fortnite"];
   const PROXY_PREFIX = "https://proxy.texas-projects.xyz?";
-  const useProxy = localStorage.getItem('useProxy') === 'true';
 
-  let currentTab = 'games';
-
-  const rawGamesList = `
+  const rawGameList = `
 Random, https://4texas4.github.io/zenith/media/gameimages/random.gif, https://4texas4.github.io/zenith/games/random.html
 Roblox, https://4texas4.github.io/zenith/media/gameimages/roblox.png, https://nowgg.fun/apps/a/19900/b.html
 Fortnite, https://4texas4.github.io/zenith/media/gameimages/fortnite.webp, https://nowgg.fun/apps/aptoide/5874/aptoide.html?deep_link=aptoidesearch://com.epicgames.fortnite
@@ -296,57 +269,58 @@ Subway Surfers, https://4texas4.github.io/zenith/media/gameimages/subway-surfers
 Hill Climb Racing, https://4texas4.github.io/zenith/media/gameimages/hcr.webp, https://4texas4.github.io/zenith/games/hillclimbracing.html
 Magic Tiles 3, https://4texas4.github.io/zenith/media/gameimages/magic-tiles-3.png, https://4texas4.github.io/zenith/games/magic-tiles-3.html
 2048, https://4texas4.github.io/zenith/media/gameimages/2048.png, https://www.hoodamath.com/mobile/games/2048-game/game.html?nocheckorient=1
-Among Us, https://4texas4.github.io/zenith/media/gameimages/among-us.jpg, https://coolubg.github.io/coolubg-list/among-us-online-scratch/
-Angry Birds, https://4texas4.github.io/zenith/media/gameimages/angry-birds.jpg, https://funhtml5games.com/angrybirds/index.html
-Bad Parenting, https://4texas4.github.io/zenith/media/gameimages/bad-parenting.jpg, https://4texas4.github.io/files/games/Bad%20Parenting%201.html
-Basket Random, https://4texas4.github.io/zenith/media/gameimages/basketrandom.png, https://t9lat22.github.io/basket-random/
-Bitlife, https://4texas4.github.io/zenith/media/gameimages/bit-life.png, https://tylerpalko.github.io/gamehub/bitlife/
-Bloons Tower Defense, https://4texas4.github.io/zenith/media/gameimages/bloons-tower-defense.png, https://ad-freegames.github.io/flash/game/bloons-tower-defense.html
-Bloxd, https://4texas4.github.io/zenith/media/gameimages/bloxd.png, https://bloxd.io/
-Bonk, https://4texas4.github.io/zenith/media/gameimages/bonk.png, https://multiplayer.gg/physics/
-Cluster Rush, https://4texas4.github.io/zenith/media/gameimages/cluster-rush.jpeg, https://www.yoosfuhl.com/game/clusterrush/game.html
-Cookie Clicker, https://4texas4.github.io/zenith/media/gameimages/cookie-clicker.jpg, https://orcatech2711.github.io/nano/games/cookieclicker/index.html
-Crazy Cattle 3D, https://4texas4.github.io/zenith/media/gameimages/crazy-cattle-3d.webp, https://rawcdn.githack.com/genizy/google-class/main/crazycattle3d/index.html
-Cut The Rope, https://4texas4.github.io/zenith/media/gameimages/cut-the-rope.png, https://cbgamesdev.github.io/chilibowlflash/ctr/index.html
-Doom, https://4texas4.github.io/zenith/media/gameimages/doom.jpg, https://raz0red.github.io/webprboom/
-Drift Boss, https://4texas4.github.io/zenith/media/gameimages/drift-boss.png, https://www.hoodamath.com/mobile/games/drift-boss/game.html?nocheckorient=1
-Eggy Car, https://4texas4.github.io/zenith/media/gameimages/eggy-car.webp, https://ubg98.github.io/EggyCar/
-FNAF 1, https://4texas4.github.io/zenith/media/gameimages/fnaf.png, https://run3.io/popgame/fnaf/fnaf1/
-FNAF 2, https://4texas4.github.io/zenith/media/gameimages/fnaf2.webp, https://run3.io/popgame/fnaf/fnaf2.html
-Flappy Bird, https://4texas4.github.io/zenith/media/gameimages/FlappyBird.webp, https://www.hoodamath.com/mobile/games/flappy-bird/game.html
-Friday Night Funkin', https://4texas4.github.io/zenith/media/gameimages/friday-night-funkin.png, https://4texas4.github.io/FNF
-Getting Over It, https://4texas4.github.io/zenith/media/gameimages/getting-over-it.jpg, https://ubg76.gitlab.io/climbing-over-it/
-Happy Wheels, https://4texas4.github.io/zenith/media/gameimages/happy-wheels.jpeg, https://happy-wheels-online.github.io/file/
-Incredibox, https://4texas4.github.io/zenith/media/gameimages/incredibox.png, https://incredibox-game.io/game/incredibox-mod/
-Jetpack Joy Ride, https://4texas4.github.io/zenith/media/gameimages/Jetpack_Joyride.png, https://emulatoros.github.io/gfile/jetpackjoyride/
-Kour, https://4texas4.github.io/zenith/media/gameimages/kour.jpeg, https://kour.io/
-Level Devil, https://4texas4.github.io/zenith/media/gameimages/level-devil.jpeg, https://leveldevil2.io/game/level-devil-2/
-Little Alchemy, https://4texas4.github.io/zenith/media/gameimages/little-alchemy.png, https://littlealchemy2.com/
-Moto X3M, https://4texas4.github.io/zenith/media/gameimages/motox3m.jpeg, https://motox3m.gitlab.io/game/moto-x3m/
-Narrow One, https://4texas4.github.io/zenith/media/gameimages/narrow-one.webp, https://narrow.one/
-Only Up, https://4texas4.github.io/zenith/media/gameimages/onlyup.jpg, https://g.vseigru.net/10/igra-onli-ap-2/
-OvO, https://4texas4.github.io/zenith/media/gameimages/OVO.jpeg, https://www.coolmathgames.com/sites/default/files/public_games/50208/
-Pacman, https://4texas4.github.io/zenith/media/gameimages/Pacman.png, https://ad-freegames.github.io/flash/game/pacman.html
-Plants Versus Zombies, https://4texas4.github.io/zenith/media/gameimages/pvz.png, https://roblnet13.github.io/pvz/game/iframe
-Poly Track, https://4texas4.github.io/zenith/media/gameimages/polytrack.webp, https://t9lat22.github.io/polytrack/
+Slope, https://4texas4.github.io/zenith/media/gameimages/slope.webp, https://freeonlinegames.github.io/slope/
 Retro Bowl, https://4texas4.github.io/zenith/media/gameimages/Retro_Bowl.png, https://game316009.konggames.com/gamez/0031/6009/live/index.html
 Run 3, https://4texas4.github.io/zenith/media/gameimages/run-3.jpeg, https://lekug.github.io/tn6pS9dCf37xAhkJv/index.html
-Sandboxels, https://4texas4.github.io/zenith/media/gameimages/sandboxels.jpeg, https://sandboxels.r74n.com/
-Shell Shockers, https://4texas4.github.io/zenith/media/gameimages/shell-shockers.png, https://scrambled.world/
-Slope, https://4texas4.github.io/zenith/media/gameimages/slope.webp, https://freeonlinegames.github.io/slope/
-Slow Roads, https://4texas4.github.io/zenith/media/gameimages/slow-roads.jpeg, https://slowroads.io/
+Happy Wheels, https://4texas4.github.io/zenith/media/gameimages/happy-wheels.jpeg, https://happy-wheels-online.github.io/file/
+Flappy Bird, https://4texas4.github.io/zenith/media/gameimages/FlappyBird.webp, https://www.hoodamath.com/mobile/games/flappy-bird/game.html
+Cookie Clicker, https://4texas4.github.io/zenith/media/gameimages/cookie-clicker.jpg, https://orcatech2711.github.io/nano/games/cookieclicker/index.html
+Friday Night Funkin', https://4texas4.github.io/zenith/media/gameimages/friday-night-funkin.png, https://4texas4.github.io/FNF
+Among Us, https://4texas4.github.io/zenith/media/gameimages/among-us.jpg, https://coolubg.github.io/coolubg-list/among-us-online-scratch/
+FNAF 1, https://4texas4.github.io/zenith/media/gameimages/fnaf.png, https://run3.io/popgame/fnaf/fnaf1/
 Smash Karts, https://4texas4.github.io/zenith/media/gameimages/smash-karts.webp, https://smashkarts.io/
-Snow Rider, https://4texas4.github.io/zenith/media/gameimages/snowrider3d.png, https://itsvijaysingh.github.io/Snow-Rider3D/
+Shell Shockers, https://4texas4.github.io/zenith/media/gameimages/shell-shockers.png, https://scrambled.world/
+Incredibox, https://4texas4.github.io/zenith/media/gameimages/incredibox.png, https://incredibox-game.io/game/incredibox-mod/
 Sprunki, https://4texas4.github.io/zenith/media/gameimages/sprunki.png, https://www.yoosfuhl.com/game/sprunkiincredibox/index.html
-Stickman Hook, https://4texas4.github.io/zenith/media/gameimages/stickmanhook.webp, https://mexisofunny.github.io/stickhook/
-Stumble Guys, https://4texas4.github.io/zenith/media/gameimages/stumble-guys.png, https://www.stumbleguys.com/play
+Cluster Rush, https://4texas4.github.io/zenith/media/gameimages/cluster-rush.jpeg, https://www.yoosfuhl.com/game/clusterrush/game.html
+OvO, https://4texas4.github.io/zenith/media/gameimages/OVO.jpeg, https://www.coolmathgames.com/sites/default/files/public_games/50208/
+Moto X3M, https://4texas4.github.io/zenith/media/gameimages/motox3m.jpeg, https://motox3m.gitlab.io/game/moto-x3m/
+Eggy Car, https://4texas4.github.io/zenith/media/gameimages/eggy-car.webp, https://ubg98.github.io/EggyCar/
+Drift Boss, https://4texas4.github.io/zenith/media/gameimages/drift-boss.png, https://www.hoodamath.com/mobile/games/drift-boss/game.html?nocheckorient=1
+Snow Rider, https://4texas4.github.io/zenith/media/gameimages/snowrider3d.png, https://itsvijaysingh.github.io/Snow-Rider3D/
+Poly Track, https://4texas4.github.io/zenith/media/gameimages/polytrack.webp, https://t9lat22.github.io/polytrack/
+BasketBall Stars, https://4texas4.github.io/zenith/media/gameimages/basketball-stars.jpg, https://basketball-stars.io/game/basketball-stars/
+Paper IO, https://4texas4.github.io/zenith/media/gameimages/paper-io.webp, https://paperio-2.github.io/a9/paper-io-2/
+Bloxd, https://4texas4.github.io/zenith/media/gameimages/bloxd.png, https://bloxd.io/
+Krunker, https://4texas4.github.io/zenith/media/gameimages/krunker.webp, https://krunker.io/
+Narrow One, https://4texas4.github.io/zenith/media/gameimages/narrow-one.webp, https://narrow.one/
 Super Mario 64, https://4texas4.github.io/zenith/media/gameimages/supermario64.jpeg, https://4texas4.github.io/files/games/sm64.html
+Doom, https://4texas4.github.io/zenith/media/gameimages/doom.jpg, https://raz0red.github.io/webprboom/
+GTA, https://4texas4.github.io/zenith/media/gameimages/gta.png, https://cbgamesdev.github.io/chilibowlflash/GBA-gh-pages/launcher.html#gta
 Temple Run 2, https://4texas4.github.io/zenith/media/gameimages/temple-run-2.png, https://www.yoosfuhl.com/game/templerun2/index.html
-Tetris, https://4texas4.github.io/zenith/media/gameimages/tetris.jpeg, https://jstris.jezevec10.com/
-Ultrakill, https://4texas4.github.io/zenith/media/gameimages/ultrakill.png, https://html5.gdata1.com/ULTRAKILL%20Prelude/?v=20250827221755
+Jetpack Joy Ride, https://4texas4.github.io/zenith/media/gameimages/Jetpack_Joyride.png, https://emulatoros.github.io/gfile/jetpackjoyride/
+Plants Versus Zombies, https://4texas4.github.io/zenith/media/gameimages/pvz.png, https://roblnet13.github.io/pvz/game/iframe
+Buckshot Roulette, https://4texas4.github.io/zenith/media/gameimages/buckshot-roulette.webp, https://db.duck.quackprep.com/html/buckshot_roulette/
+Infinite Craft, https://4texas4.github.io/zenith/media/gameimages/infinite-craft.webp, https://script.google.com/macros/s/AKfycby6VkmafM4044keDc4OclZ4Saq2a8lth-pAC1XY_7c1_qVsH9IsVKrqbuWH-SJO1puW/exec
+Sandboxels, https://4texas4.github.io/zenith/media/gameimages/sandboxels.jpeg, https://sandboxels.r74n.com/
+Little Alchemy, https://4texas4.github.io/zenith/media/gameimages/little-alchemy.png, https://littlealchemy2.com/
+Slow Roads, https://4texas4.github.io/zenith/media/gameimages/slow-roads.jpeg, https://slowroads.io/
 Vex 5, https://4texas4.github.io/zenith/media/gameimages/vex5.jpg, https://tylerpalko.github.io/gamehub/vex5/
-Wordle, https://4texas4.github.io/zenith/media/gameimages/wordle.webp, https://www.nytimes.com/games/wordle/index.html
-Zombs Royale, https://4texas4.github.io/zenith/media/gameimages/zombsroyale.png, https://zombsroyale.io/
+Vex 6, https://4texas4.github.io/zenith/media/gameimages/vex6.jpeg, https://tylerpalko.github.io/gamehub/vex6/
+Duck Life, https://4texas4.github.io/zenith/media/gameimages/duck-life.jpeg, https://narrow-one.github.io/n/duck-life/
+Stickman Hook, https://4texas4.github.io/zenith/media/gameimages/stickmanhook.webp, https://mexisofunny.github.io/stickhook/
+Helix Jump, https://4texas4.github.io/zenith/media/gameimages/helix-jump.jpeg, https://cdn.gamesnacks.com/helixjump1/gameCode/index.html
+Tunnel Rush 2, https://4texas4.github.io/zenith/media/gameimages/tunnel-rush.png, https://gamesbun.github.io/tunnel-rush-2/
+House Of Hazards, https://4texas4.github.io/zenith/media/gameimages/house-of-hazards.jpeg, https://t9lat22.github.io/house-of-hazards/
+Stumble Guys, https://4texas4.github.io/zenith/media/gameimages/stumble-guys.png, https://www.stumbleguys.com/play
+lolbeans.io, https://4texas4.github.io/zenith/media/gameimages/lolbeans.webp, https://lolbeans.io/
+Bonk, https://4texas4.github.io/zenith/media/gameimages/bonk.png, https://multiplayer.gg/physics/
+Skribbl, https://4texas4.github.io/zenith/media/gameimages/skribbl.jfif, https://skribbl.io/
+Diep, https://4texas4.github.io/zenith/media/gameimages/diep.jfif, https://diep.io
+Solitaire, https://4texas4.github.io/zenith/media/gameimages/solitare.webp, https://www.calculators.org/games/solitaire/game.php
+Minesweeper, https://4texas4.github.io/zenith/media/gameimages/minesweeper.png, https://www.minesweepergoogle.com/gameapp.html
+UNO, https://4texas4.github.io/zenith/media/gameimages/uno.png, https://www.xpgameplus.com/games/uno/default.html
+Pacman, https://4texas4.github.io/zenith/media/gameimages/Pacman.png, https://ad-freegames.github.io/flash/game/pacman.html
 `;
 
   const rawAppsList = `
@@ -367,33 +341,34 @@ Emulator, https://4texas4.github.io/zenith/media/toolsimages/emulator.png, https
 Random Website, https://4texas4.github.io/zenith/media/toolsimages/button.png, https://4texas4.github.io/zenith/tools/random.html
 `;
 
+  const useProxy = localStorage.getItem('useProxy') === 'true';
+
   function parseList(raw) {
-    return raw
-      .trim()
-      .split('\n')
-      .map(line => {
-        const parts = line.split(',');
-        const title = parts[0]?.trim() ?? '';
-        const img = parts[1]?.trim() ?? '';
-        const link = parts.slice(2).join(',').trim() ?? '';
-        return [title, img, link];
-      })
-      .filter(item => item[0] && item[2]);
+    return raw.trim().split('\n').map(line => {
+      const parts = line.split(',');
+      const title = parts[0]?.trim() ?? '';
+      const img = parts[1]?.trim() ?? '';
+      const link = parts.slice(2).join(',').trim() ?? '';
+      return [title, img, link];
+    }).filter(item => item[0] && item[2]);
   }
 
-  const games = parseList(rawGamesList);
+  const games = parseList(rawGameList);
   const apps = parseList(rawAppsList);
 
+  let currentTab = 'games';
   const gameGrid = document.getElementById('game-grid');
+  const searchInput = document.getElementById('search');
+  const tabBtns = document.querySelectorAll('.tab-btn');
 
-  function renderItems(list){
+  function renderItems(list) {
     gameGrid.innerHTML = '';
     const frag = document.createDocumentFragment();
     
     list.forEach(([title, img, link]) => {
       const card = document.createElement('div');
       card.className = 'game-card';
-      card.setAttribute('role','link');
+      card.setAttribute('role', 'link');
       card.tabIndex = 0;
 
       const shouldProxy = useProxy || ALWAYS_PROXY.includes(title);
@@ -412,51 +387,36 @@ Random Website, https://4texas4.github.io/zenith/media/toolsimages/button.png, h
     gameGrid.appendChild(frag);
   }
 
-  function switchTab(tab) {
-    currentTab = tab;
-    document.getElementById('games-btn').classList.toggle('active', tab === 'games');
-    document.getElementById('apps-btn').classList.toggle('active', tab === 'apps');
-    
-    const searchInput = document.getElementById('search');
-    searchInput.placeholder = tab === 'games' ? 'Search games...' : 'Search apps...';
-    
-    const list = tab === 'games' ? games : apps;
-    const q = searchInput.value.toLowerCase().trim();
-    
-    if (!q) {
-      renderItems(list);
-    } else {
-      const filtered = list.filter(([title]) => title.toLowerCase().includes(q));
-      renderItems(filtered);
-    }
-  }
-
-  // Initial render
-  renderItems(games);
-
-  // Search functionality
-  const searchInput = document.getElementById('search');
-  searchInput.addEventListener('input', () => {
+  function filterAndRender() {
     const q = searchInput.value.toLowerCase().trim();
     const list = currentTab === 'games' ? games : apps;
-    
-    if (!q) { 
-      renderItems(list); 
-      return; 
-    }
-    
-    const filtered = list.filter(([title]) => title.toLowerCase().includes(q));
+    const filtered = q ? list.filter(([title]) => title.toLowerCase().includes(q)) : list;
     renderItems(filtered);
+  }
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentTab = btn.dataset.tab;
+      searchInput.placeholder = currentTab === 'games' ? 'Search games...' : 'Search apps...';
+      filterAndRender();
+    });
   });
 
+  searchInput.addEventListener('input', filterAndRender);
+
+  // Initial render
+  filterAndRender();
+
   // Clock
-  function updateTime(){
+  function updateTime() {
     const now = new Date();
     let hh = now.getHours();
     const ampm = hh >= 12 ? 'PM' : 'AM';
     hh = hh % 12 || 12;
-    const mm = String(now.getMinutes()).padStart(2,'0');
-    const ss = String(now.getSeconds()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
     document.getElementById('time').innerHTML = `${hh}:${mm}:<span class="seconds">${ss}</span><span class="ampm">${ampm}</span>`;
   }
   setInterval(updateTime, 1000);

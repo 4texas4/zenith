@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rat Games Clock</title>
-    <link rel="icon" href="../media/rat.svg" type="image/svg+xml">
+    <title>Live Clock & Countdown Timer</title>
+    <link rel="icon" href="clock.png" type="image/png"> <!-- Favicon added -->
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -12,20 +12,19 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #1a1612;
+            background-color: #f8f9fa;
             font-family: 'Comic Neue', sans-serif;
         }
         #clock-container, #timer-container {
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            background-color: #2d251e;
+            background-color: #ffffff;
             padding: 40px;
             border-radius: 30px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
             font-size: 140px;
-            color: #f5f0eb;
-            border: 1px solid rgba(210, 180, 140, 0.2);
+            color: #333;
         }
         #seconds-container {
             font-size: 84px;
@@ -46,17 +45,15 @@
         input, button {
             padding: 10px 20px;
             font-size: 24px;
-            border: 1px solid rgba(210, 180, 140, 0.3);
+            border: none;
             border-radius: 15px;
-            background-color: #2d251e;
-            color: #f5f0eb;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             margin: 10px;
         }
         button:hover {
-            background-color: #D2B48C;
-            color: #1a1612;
+            background-color: #e0e0e0;
         }
         #clearButton {
             display: none;

@@ -30,7 +30,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* --- TOP NAV --- */
     .top-nav {
       position: fixed; top: 0; left: 0; right: 0; height: 90px; z-index: 5000;
       display: flex; align-items: center; padding: 0 4%;
@@ -46,14 +45,14 @@
     .search-wrapper { position: relative; width: 100%; max-width: 550px; }
     
     #globalSearch {
-      width: 100%; background: rgba(255, 255, 255, 0.05); border: 2px solid var(--border-light);
-      padding: 14px 25px 14px 50px; border-radius: 12px; color: white; font-size: 1rem;
+      width: 100%; background: rgba(45, 37, 30, 0.6); border: 2px solid var(--border-light);
+      padding: 14px 25px 14px 50px; border-radius: 12px; color: var(--text-main); font-size: 1rem;
       font-family: inherit; outline: none; transition: all 0.3s;
     }
-    .search-wrapper::before { content: '🔍'; position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 1rem; opacity: 0.5; }
-    #globalSearch:focus { border-color: var(--accent); background: rgba(0, 229, 255, 0.03); box-shadow: 0 0 30px var(--accent-glow); }
+    .search-wrapper::before { content: ''; position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 1rem; opacity: 0.5; }
+    #globalSearch:focus { border-color: var(--accent); background: rgba(210, 180, 140, 0.05); box-shadow: 0 0 30px var(--accent-glow); }
+    #globalSearch::placeholder { color: var(--text-dim); }
 
-    /* --- HERO --- */
     #hero { position: relative; height: 90vh; width: 100%; display: flex; align-items: flex-end; padding: 0 5% 220px; overflow: hidden; }
     .hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center 20%; z-index: -2; opacity: 0; transition: opacity 1.2s ease; transform: scale(1.05); }
     .hero-bg.active { opacity: 1; animation: slowZoom 20s linear infinite alternate; }
@@ -64,13 +63,11 @@
     #heroTitle { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; line-height: 1.1; margin-bottom: 10px; }
     #heroOverview { color: var(--text-dim); margin-bottom: 2rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-    /* --- MARQUEE --- */
     .marquee-container { position: absolute; bottom: 40px; left: 0; width: 100%; height: 130px; overflow: hidden; z-index: 20; mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); }
     .marquee-track { display: flex; gap: 15px; width: max-content; animation: scrollLeft 60s linear infinite; padding: 10px 0; }
     .marquee-item { width: 180px; height: 100px; border-radius: 10px; background-size: cover; cursor: pointer; border: 2px solid transparent; transition: 0.4s; opacity: 0.4; }
     .marquee-item.active { opacity: 1; border-color: var(--accent); transform: scale(1.08); }
 
-    /* --- GRID --- */
     .section-header { padding: 40px 5% 0; max-width: 1600px; margin: 0 auto; }
     #gridTitle { font-size: 1.5rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
 
@@ -80,31 +77,26 @@
     .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
     .card-info { position: absolute; bottom: 0; width: 100%; padding: 20px 10px 10px; background: linear-gradient(to top, black, transparent); }
 
-    /* --- MODALS --- */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; z-index: 6000; opacity: 0; transition: 0.4s; padding: 20px; }
     .modal-overlay.show { opacity: 1; display: flex; }
     
     .selection-box { background: var(--bg-surface); width: 100%; max-width: 450px; padding: 40px; border-radius: 25px; border: 1px solid var(--border-light); text-align: center; }
     
-    /* --- PLAYER BOX & FS OVERRIDES --- */
     .player-box { width: 100%; max-width: 1200px; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid var(--border-light); transition: 0.3s; }
     .player-head { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-elevated); border-bottom: 1px solid var(--border-light); }
     
-    /* Google Sites Faux-Fullscreen State */
     .player-box.fs-active { position: fixed; inset: 0; max-width: 100vw; height: 100vh; border-radius: 0; border: none; z-index: 9999; }
     .player-box.fs-active .player-head { display: none; }
     .player-box.fs-active iframe { height: 100vh; aspect-ratio: auto; }
 
-    /* The Invisible Top-Edge Trigger Zone */
     #fsHoverZone {
       position: fixed; top: 0; left: 0; right: 0; height: 150px; 
       z-index: 10000; display: none; cursor: default;
     }
 
-    /* Floating Exit Button for Fullscreen */
     #fsExitBtn {
       position: fixed; top: 25px; right: 25px; width: 50px; height: 50px; border-radius: 50%;
-      background: rgba(10, 12, 14, 0.8); border: 2px solid rgba(255,255,255,0.2); color: white;
+      background: rgba(45, 37, 30, 0.8); border: 2px solid rgba(210, 180, 140, 0.2); color: var(--text-main);
       font-size: 1.5rem; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center;
       z-index: 10001; backdrop-filter: blur(10px); transition: opacity 0.4s ease, transform 0.2s;
     }
@@ -112,13 +104,13 @@
 
     .source-switcher { display: flex; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 100px; border: 1px solid var(--border-light); gap: 5px; }
     .source-btn { padding: 6px 15px; border-radius: 100px; font-size: 0.75rem; font-weight: 800; cursor: pointer; border: none; transition: 0.3s; color: var(--text-dim); background: transparent; }
-    .source-btn.active { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent-glow); }
-    .source-btn.active.stable { background: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+    .source-btn.active { background: var(--accent); color: #1a1612; box-shadow: 0 0 15px var(--accent-glow); }
+    .source-btn.active.stable { background: var(--text-main); box-shadow: 0 0 15px rgba(245, 240, 235, 0.3); }
 
     iframe { width: 100%; aspect-ratio: 16/9; border: none; background: #000; display: block; }
 
-    .btn-play { background: var(--text-main); color: #000; padding: 14px 32px; border-radius: 100px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
-    .btn-play:hover { transform: scale(1.05); background: var(--accent); box-shadow: 0 0 30px var(--accent-glow); }
+    .btn-play { background: var(--accent); color: #1a1612; padding: 14px 32px; border-radius: 100px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+    .btn-play:hover { transform: scale(1.05); background: var(--accent-pink); box-shadow: 0 0 30px rgba(255, 182, 193, 0.5); }
 
     #disclaimer { position: fixed; inset: 0; background: var(--bg-deep); z-index: 9999; display: flex; align-items: center; justify-content: center; }
 
@@ -142,7 +134,7 @@
   <div id="disclaimer">
     <div style="text-align:center;">
       <h1 style="font-weight:900; font-size: 3rem; margin-bottom: 20px; color: var(--accent);">RAT GAMES<span style="color: var(--accent-pink);">.</span></h1>
-      <h1 style="font-weight:900; font-size: 1rem; margin-bottom: 20px;">Rat Games Movies is simply a wrapper for third party media sites. Rat Games does NOT host any media.<span>.</span></h1>
+      <h1 style="font-weight:900; font-size: 1rem; margin-bottom: 20px;">Rat Games Movies is simply a wrapper for third party media sites. Rat Games does NOT host any media.</h1>
       <button onclick="init()" class="btn-play">INITIALIZE STREAM</button>
     </div>
   </div>
@@ -165,10 +157,10 @@
   <div id="selectionModal" class="modal-overlay">
     <div class="selection-box">
       <h2 id="selTitle" style="margin-bottom:20px;">Series</h2>
-      <select id="seasonSelect" style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; background:var(--bg-elevated); color:white; border:1px solid var(--border-light); font-family:inherit;"></select>
-      <select id="episodeSelect" style="width:100%; padding:15px; margin-bottom:30px; border-radius:10px; background:var(--bg-elevated); color:white; border:1px solid var(--border-light); font-family:inherit;"></select>
+      <select id="seasonSelect" style="width:100%; padding:15px; margin-bottom:15px; border-radius:10px; background:var(--bg-elevated); color:var(--text-main); border:1px solid var(--border-light); font-family:inherit;"></select>
+      <select id="episodeSelect" style="width:100%; padding:15px; margin-bottom:30px; border-radius:10px; background:var(--bg-elevated); color:var(--text-main); border:1px solid var(--border-light); font-family:inherit;"></select>
       <div style="display:flex; gap:10px;">
-        <button onclick="hideModal('selectionModal')" style="flex:1; background:transparent; color:white; border:none; cursor:pointer;">CANCEL</button>
+        <button onclick="hideModal('selectionModal')" style="flex:1; background:transparent; color:var(--text-main); border:none; cursor:pointer;">CANCEL</button>
         <button id="confirmBtn" class="btn-play" style="flex:2;">INITIALIZE</button>
       </div>
     </div>
@@ -185,14 +177,14 @@
             </div>
         </div>
         <div>
-            <button onclick="enterFauxFullscreen()" style="background:transparent; color:white; border:none; cursor:pointer; font-weight:800; margin-right: 15px;">[FULLSCREEN]</button>
-            <button onclick="hideModal('playerModal')" style="background:transparent; color:white; border:none; cursor:pointer; font-weight:800;">CLOSE [X]</button>
+            <button onclick="enterFauxFullscreen()" style="background:transparent; color:var(--text-main); border:none; cursor:pointer; font-weight:800; margin-right: 15px;">[FULLSCREEN]</button>
+            <button onclick="hideModal('playerModal')" style="background:transparent; color:var(--text-main); border:none; cursor:pointer; font-weight:800;">CLOSE [X]</button>
         </div>
       </div>
       <iframe id="playerIframe" allowfullscreen></iframe>
       
       <div id="fsHoverZone" onmousemove="wakeUpFullscreenUI()"></div>
-      <button id="fsExitBtn" onclick="exitFauxFullscreen()">✕</button>
+      <button id="fsExitBtn" onclick="exitFauxFullscreen()">X</button>
     </div>
   </div>
 
@@ -201,7 +193,6 @@
     const baseURL = 'https://api.themoviedb.org/3';
     let trending = [], curHero = 0, activeBg = 1, heroTimer, popularCache = [];
     
-    // Routing Logic
     let currentMedia = { id: '', type: '', s: '', e: '' };
     const routes = { texas: "https://movies.texas-projects.xyz/", vercel: "https://zenith-movies.vercel.app/" };
     let activeRoute = 'texas';
@@ -338,7 +329,6 @@
       setTimeout(() => { el.style.display = 'none'; if(id === 'playerModal') document.getElementById('playerIframe').src = ''; }, 400);
     }
 
-    /* --- REFINED FULLSCREEN & MOUSE TRACKING --- */
     let fsMouseTimer;
     const fsExitBtn = document.getElementById('fsExitBtn');
     const fsHoverZone = document.getElementById('fsHoverZone');
@@ -346,7 +336,7 @@
     function enterFauxFullscreen() {
       document.getElementById('pBox').classList.add('fs-active');
       fsExitBtn.style.display = 'flex';
-      fsHoverZone.style.display = 'block'; // Turn on the top-edge sensor
+      fsHoverZone.style.display = 'block';
       
       try { document.documentElement.requestFullscreen(); } catch(e){}
       
@@ -357,7 +347,7 @@
     function exitFauxFullscreen() {
       document.getElementById('pBox').classList.remove('fs-active');
       fsExitBtn.style.display = 'none';
-      fsHoverZone.style.display = 'none'; // Turn off sensor
+      fsHoverZone.style.display = 'none';
       
       document.removeEventListener('mousemove', wakeUpFullscreenUI);
       clearTimeout(fsMouseTimer);
@@ -366,19 +356,13 @@
 
     function wakeUpFullscreenUI() {
       fsExitBtn.style.opacity = '1';
-      fsExitBtn.style.pointerEvents = 'auto'; // Re-enable clicking when visible
-      
+      fsExitBtn.style.pointerEvents = 'auto';
       clearTimeout(fsMouseTimer);
       fsMouseTimer = setTimeout(() => {
         fsExitBtn.style.opacity = '0';
-        fsExitBtn.style.pointerEvents = 'none'; // Prevent ghost clicks when hidden
-      }, 1500);
+        fsExitBtn.style.pointerEvents = 'none';
+      }, 2500);
     }
-
-    // Bonus: Let the user hit ESC to exit fullscreen safely
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') exitFauxFullscreen();
-    });
   </script>
 </body>
 </html>

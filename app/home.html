@@ -8,22 +8,13 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
 
-  :root {
-    --bg-dark: #1a1612;
-    --bg-brown: #2d251e;
-    --accent-tan: #D2B48C;
-    --accent-pink: #FFB6C1;
-    --text-light: #f5f0eb;
-    --text-muted: #a89888;
-  }
-
   body{
     height:100vh;
-    background: var(--bg-dark);
+    background: #1a1612;
     display:flex;
     justify-content:center;
     align-items:center;
-    color: var(--text-light);
+    color:#f5f0eb;
     overflow:hidden;
     position:relative;
   }
@@ -32,26 +23,23 @@
     font-weight: 900;
   }
 
-  /* Rat GIF background */
+  /* Rat gif background */
   body::before{
     content:'';
     position:absolute;
     top:0; left:0;
     width:100%; height:100%;
-    background-image: url('../media/rat.gif');
-    background-size: cover;
-    background-position: center;
+    background: url('../media/rat.gif') center center / cover no-repeat;
     opacity: 0.1;
-    filter: grayscale(30%);
     z-index:0;
   }
 
-  body::after{
+  body::after {
     content:'';
     position:absolute;
     top:0; left:0;
     width:100%; height:100%;
-    background: radial-gradient(ellipse at center, transparent 0%, var(--bg-dark) 70%);
+    background: radial-gradient(circle at center, transparent 20%, #1a1612 70%);
     z-index:0;
   }
 
@@ -59,15 +47,29 @@
   .logo-container {
     z-index:1;
     position:relative;
-    animation: float 6s ease-in-out infinite;
+    animation:float 6s ease-in-out infinite;
     text-align: center;
   }
 
   .logo-container img {
-    max-width: 400px;
+    max-width: 500px;
     width: 80vw;
     height: auto;
-    filter: drop-shadow(0 0 20px rgba(210, 180, 140, 0.3));
+    filter: drop-shadow(0 0 30px rgba(210, 180, 140, 0.3));
+  }
+
+  /* Fallback text if image fails */
+  .logo-text {
+    font-size:8rem;
+    font-weight:700;
+    text-align:center;
+    color: #D2B48C;
+    text-shadow:0 0 10px rgba(210, 180, 140, 0.2),0 0 20px rgba(210, 180, 140, 0.3);
+    display: none;
+  }
+
+  .logo-text .pink {
+    color: #FFB6C1;
   }
 
   @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-15px)}100%{transform:translateY(0)}}
@@ -92,6 +94,10 @@
     padding:0 6px;
   }
 
+  footer span:nth-child(1){ padding-right:6px; }
+  footer span:nth-child(2){ padding-left:6px; padding-right:6px; }
+  footer span:nth-child(3){ padding-left:6px; }
+
   footer > span:not(:last-child)::after{
     content:'';
     position:absolute;
@@ -100,31 +106,33 @@
     transform:translateY(-50%);
     width:1px;
     height:60%;
-    background: rgba(210, 180, 140, 0.3);
+    background:rgba(210, 180, 140, 0.3);
   }
 
-  a{ color: var(--text-light); text-decoration:none }
-  a:hover{ text-decoration:underline; color: var(--accent-tan); }
+  a{ color:#f5f0eb; text-decoration:none }
+  a:hover{ text-decoration:underline; color: #D2B48C; }
 
   /* Clock */
   #time{ display:flex; align-items:center; gap:2px; }
-  .seconds{ color: var(--text-muted); font-weight:400; margin-left:-5px; }
-  .ampm{ color: var(--text-muted); font-size:0.8em; margin-left:-8px; }
+  .seconds{ color:rgba(245, 240, 235, 0.4); font-weight:400; margin-left:-5px; }
+  .ampm{ color:rgba(245, 240, 235, 0.5); font-size:0.8em; margin-left:-8px; }
 
   /* Battery */
   .battery{ display:flex; align-items:center; gap:3px; }
-  .battery svg{ width:24px; height:24px; stroke: var(--text-light); }
+  .battery svg{ width:24px; height:24px; stroke:#f5f0eb; }
 
   @media (max-width:600px){
     footer{ flex-direction:column; gap:12px; bottom:10px; font-size:1.1rem }
     footer span:not(:last-child)::after{ display:none }
     .logo-container img { max-width: 280px; }
+    .logo-text{ font-size:4rem }
   }
 </style>
 </head>
 <body>
   <div class="logo-container">
-    <img src="../media/logo.png" alt="Rat Games" onerror="this.style.display='none'; this.parentElement.innerHTML='<h1 style=\'font-size:8rem; font-weight:900; text-shadow:0 0 10px rgba(210,180,140,0.2),0 0 20px rgba(210,180,140,0.3);\'>RAT GAMES</h1>';">
+    <img src="../media/logo.png" alt="Rat Games" id="logo-img" onerror="document.getElementById('logo-img').style.display='none'; document.getElementById('logo-text').style.display='block';">
+    <h1 id="logo-text" class="logo-text bold">RAT<span class="pink">.</span>GAMES</h1>
   </div>
 
   <footer>
