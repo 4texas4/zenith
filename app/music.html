@@ -455,8 +455,7 @@ body.lmode .track-meta h1 { font-size: 1.4rem; }
 <audio id="player"></audio>
 
 <script>
-const API = 'https://spotify.4texasplayz4.workers.dev';
-const SOUNDCLOUD_API = 'https://0.4texasplayz4.workers.dev';
+const API = 'https://music.4texasplayz4.workers.dev';
 const audio = document.getElementById('player');
 
 // ── STATE ──
@@ -480,15 +479,16 @@ async function getSourcePref(track) {
         return data.source || null;
     } catch { return null; }
 }
-async function setSourcePref(track, source) {
-    const key = trackPrefKey(track);
-    try {
-        await fetch(`${API}/pref/${encodeURIComponent(key)}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ source })
-        });
-    } catch(e) { console.warn('Failed to save source pref', e); }
+function setSourcePref(track, source) {
+    if(!track.spotifyId) return;
+    const prefs = JSON.parse(localStorage.getItem('z_prefs')||'{}');
+    prefs[track.spotifyId] = source;
+    localStorage.setItem('z_prefs', JSON.stringify(prefs));
+}
+function getLocalSourcePref(track) {
+    if(!track.spotifyId) return null;
+    const prefs = JSON.parse(localStorage.getItem('z_prefs')||'{}');
+    return prefs[track.spotifyId] || null;
 }
 
 // ── NORMALIZE ──
@@ -740,8 +740,8 @@ function mobSongs(id) { mobView='songs'; curPlId=id; renderMobSongs(id); }
 async function doSearch(q) {
     if(!q.trim()) return; notify('Searching...');
     try {
-        const mainApi = cfg.mainSource === 'spotify' ? API : SOUNDCLOUD_API;
-        const res = await fetch(`${mainApi}/s/${cq(q)}`);
+        const ep = cfg.mainSource === 'spotify' ? `${API}/s/s/${cq(q)}` : `${API}/c/s/${cq(q)}`;
+        const res = await fetch(ep);
         const raw = await res.json();
         const results = Array.isArray(raw) ? raw : (raw.results||[]);
         const box = document.getElementById('search-results'); box.innerHTML='';
@@ -767,132 +767,63 @@ async function playTrack(idx) {
     const track=queue[idx];
     notify('Loading...');
 
+    const localPref = getLocalSourcePref(track);
+    let apiPref = null;
+    if(!localPref && track.spotifyId) apiPref = await getSourcePref(track);
+    const trackSource = localPref || apiPref || track.source || cfg.mainSource;
     let streamUrl = null;
     let usedSource = null;
-    // Check if user has a preferred source for this track
-    const savedPref = await getSourcePref(track);
-    const trackSource = savedPref || track.source || cfg.mainSource;
 
-    // Try main source first
-    if(trackSource === 'spotify' && track.spotifyId) {
-        try {
-            streamUrl = `${API}/d/${track.spotifyId}`;
-            // Test if URL is valid by attempting to load
-            const testRes = await fetch(streamUrl, {method: 'HEAD'});
-            if(testRes.ok) {
-                usedSource = 'spotify';
-            } else {
-                streamUrl = null;
-            }
-        } catch(e) { 
-            console.warn('Spotify direct failed', e); 
-            streamUrl = null;
-        }
-    } else if(trackSource === 'soundcloud' && track.url) {
-        try {
-            const slug = track.url.replace(/https?:\/\/soundcloud\.com\//,'');
-            const res = await fetch(`${SOUNDCLOUD_API}/d/${slug}`);
-            const data = await res.json();
-            if(data.streamUrl) {
-                streamUrl = data.streamUrl;
-                usedSource = 'soundcloud';
-            }
-        } catch(e) { console.warn('SoundCloud resolve failed', e); }
+    function buildUrl(src, t) {
+        if(src === 'spotify' && t.spotifyId) return `${API}/s/d/${t.spotifyId}?fallback=1`;
+        if(src === 'soundcloud' && t.url) return `${API}/c/d/${t.url.replace(/https?:\/\/soundcloud\.com\//,'')}?fallback=1`;
+        return null;
     }
 
-    // Fallback if main source failed
+    streamUrl = buildUrl(trackSource, track);
+    if(streamUrl) usedSource = trackSource;
+
     if(!streamUrl) {
-        notify('Trying fallback source...');
-        const fallbackApi = cfg.fallbackSource === 'spotify' ? API : SOUNDCLOUD_API;
+        notify('Searching...');
         try {
-            const res = await fetch(`${fallbackApi}/s/${cq(track.title + ' ' + track.artist)}`);
-            const raw = await res.json();
+            const ep = trackSource === 'spotify' ? `${API}/s/s/${cq(track.title+' '+track.artist)}` : `${API}/c/s/${cq(track.title+' '+track.artist)}`;
+            const raw = await fetch(ep).then(r=>r.json());
             const results = Array.isArray(raw) ? raw : (raw.results||[]);
-            if(results.length) {
-                const found = normSearch(results[0]);
-                if(cfg.fallbackSource === 'spotify' && found.spotifyId) {
-                    try {
-                        streamUrl = `${API}/d/${found.spotifyId}`;
-                        const testRes = await fetch(streamUrl, {method: 'HEAD'});
-                        if(testRes.ok) {
-                            usedSource = 'spotify';
-                        } else {
-                            streamUrl = null;
-                        }
-                    } catch(e) { streamUrl = null; }
-                } else if(cfg.fallbackSource === 'soundcloud' && found.url) {
-                    const slug = found.url.replace(/https?:\/\/soundcloud\.com\//,'');
-                    const res2 = await fetch(`${SOUNDCLOUD_API}/d/${slug}`);
-                    const data2 = await res2.json();
-                    if(data2.streamUrl) {
-                        streamUrl = data2.streamUrl;
-                        usedSource = 'soundcloud';
-                    }
-                }
-            }
-        } catch(e) { console.error('Fallback failed', e); }
+            if(results.length) { const f=normSearch(results[0]); streamUrl=buildUrl(trackSource,f); if(streamUrl) usedSource=trackSource; }
+        } catch(e) { console.warn(e); }
+    }
+
+    if(!streamUrl) {
+        notify('Trying fallback...');
+        const fb = cfg.fallbackSource !== trackSource ? cfg.fallbackSource : (trackSource==='spotify'?'soundcloud':'spotify');
+        try {
+            const ep = fb === 'spotify' ? `${API}/s/s/${cq(track.title+' '+track.artist)}` : `${API}/c/s/${cq(track.title+' '+track.artist)}`;
+            const raw = await fetch(ep).then(r=>r.json());
+            const results = Array.isArray(raw) ? raw : (raw.results||[]);
+            if(results.length) { const f=normSearch(results[0]); streamUrl=buildUrl(fb,f); if(streamUrl) usedSource=fb; }
+        } catch(e) { console.error(e); }
     }
 
     if(!streamUrl) return notify('Could not find stream');
-
     currentSource = usedSource;
-    // Save which source worked for this track (non-blocking)
     setSourcePref(track, usedSource);
-    curData = {
-        title: track.title,
-        artist: track.artist,
-        artwork: track.artwork,
-        streamUrl,
-        source: usedSource
-    };
-
+    curData = { title: track.title, artist: track.artist, artwork: track.artwork, streamUrl, source: usedSource };
     audio.src = streamUrl;
-    
-    // Handle playback errors with fallback
     audio.onerror = async () => {
-        console.error('Audio playback error, trying fallback');
-        notify('Playback error, trying fallback...');
-        
-        // Try the other source
-        const otherSource = usedSource === 'spotify' ? 'soundcloud' : 'spotify';
-        const otherApi = otherSource === 'spotify' ? API : SOUNDCLOUD_API;
-        
+        notify('Trying other source...');
+        const other = usedSource === 'spotify' ? 'soundcloud' : 'spotify';
         try {
-            const res = await fetch(`${otherApi}/s/${cq(track.title + ' ' + track.artist)}`);
-            const raw = await res.json();
+            const ep = other === 'spotify' ? `${API}/s/s/${cq(track.title+' '+track.artist)}` : `${API}/c/s/${cq(track.title+' '+track.artist)}`;
+            const raw = await fetch(ep).then(r=>r.json());
             const results = Array.isArray(raw) ? raw : (raw.results||[]);
             if(results.length) {
-                const found = normSearch(results[0]);
-                let newStreamUrl = null;
-                
-                if(otherSource === 'spotify' && found.spotifyId) {
-                    newStreamUrl = `${API}/d/${found.spotifyId}`;
-                } else if(otherSource === 'soundcloud' && found.url) {
-                    const slug = found.url.replace(/https?:\/\/soundcloud\.com\//,'');
-                    const res2 = await fetch(`${SOUNDCLOUD_API}/d/${slug}`);
-                    const data2 = await res2.json();
-                    newStreamUrl = data2.streamUrl;
-                }
-                
-                if(newStreamUrl) {
-                    currentSource = otherSource;
-                    curData.streamUrl = newStreamUrl;
-                    curData.source = otherSource;
-                    audio.src = newStreamUrl;
-                    audio.play().catch(()=>notify('Playback failed'));
-                    applyTrackUI(curData);
-                } else {
-                    notify('All sources failed');
-                }
+                const newUrl = buildUrl(other, normSearch(results[0]));
+                if(newUrl) { currentSource=other; curData.streamUrl=newUrl; curData.source=other; audio.src=newUrl; audio.play().catch(()=>notify('Playback failed')); applyTrackUI(curData); return; }
             }
-        } catch(e) {
-            console.error('Fallback on error failed', e);
-            notify('Playback failed');
-        }
+        } catch(e) { console.error(e); }
+        notify('All sources failed');
     };
-    
-    audio.play().catch(e=>{ console.error('Play failed',e); });
-
+    audio.play().catch(e=>console.error(e));
     applyTrackUI(curData);
 }
 
@@ -914,6 +845,8 @@ function applyTrackUI(d) {
     document.getElementById('d-addpl').style.display = 'inline-block';
     document.getElementById('d-switch').style.display = 'inline-block';
 
+    if(artwork) sampleArtworkColor(artwork); else applyLyricColor(null);
+
     // Mobile bg - don't set here, only set when fullscreen opens
 
     // Mini
@@ -933,6 +866,65 @@ function applyTrackUI(d) {
         navigator.mediaSession.setActionHandler('nexttrack',()=>skip(1));
         navigator.mediaSession.setActionHandler('play',()=>audio.play());
         navigator.mediaSession.setActionHandler('pause',()=>audio.pause());
+    }
+}
+
+function sampleArtworkColor(url) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        try {
+            const size = 40;
+            const c = document.createElement('canvas');
+            c.width = c.height = size;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, size, size);
+            const data = ctx.getImageData(0, 0, size, size).data;
+            let r=0, g=0, b=0, count=0;
+            for(let i=0; i<data.length; i+=4) {
+                // skip near-transparent pixels
+                if(data[i+3] < 128) continue;
+                r += data[i]; g += data[i+1]; b += data[i+2]; count++;
+            }
+            if(!count) { applyLyricColor(null); return; }
+            r=r/count; g=g/count; b=b/count;
+            // perceptual luminance
+            const lum = 0.299*r + 0.587*g + 0.114*b;
+            applyLyricColor(lum);
+        } catch(e) { applyLyricColor(null); }
+    };
+    img.onerror = () => applyLyricColor(null);
+    img.src = url;
+}
+
+function applyLyricColor(lum) {
+    // lum: 0 (black) → 255 (white). null = reset to default.
+    // invert: light artwork → dark lyrics, dark artwork → light lyrics
+    let inactive, active;
+    if(lum === null) {
+        inactive = null; active = null;
+    } else if(lum > 160) {
+        // bright/white-ish artwork → dark text
+        inactive = 'rgba(0,0,0,0.45)';
+        active   = '#111';
+    } else if(lum < 80) {
+        // dark/black-ish artwork → light text (default-ish but brighter)
+        inactive = 'rgba(255,255,255,0.55)';
+        active   = '#fff';
+    } else {
+        // mid-tone → keep defaults
+        inactive = null; active = null;
+    }
+    const style = document.getElementById('lyric-color-override') || (() => {
+        const s = document.createElement('style');
+        s.id = 'lyric-color-override';
+        document.head.appendChild(s);
+        return s;
+    })();
+    if(inactive && active) {
+        style.textContent = `.lyric-line { color: ${inactive} !important; } .lyric-line.active { color: ${active} !important; }`;
+    } else {
+        style.textContent = '';
     }
 }
 
@@ -986,6 +978,11 @@ audio.ontimeupdate = ()=>{
 };
 audio.onplay=()=>setPlayUI(true);
 audio.onpause=()=>setPlayUI(false);
+audio.onloadedmetadata=()=>{
+    const dur=audio.duration||0;
+    document.getElementById('d-dur').textContent=ft(dur);
+    document.getElementById('fs-dur').textContent=ft(dur);
+};
 audio.onended=()=>{ if(cfg.autoplay) skip(1); };
 
 // Custom seek bar drag logic
@@ -1164,11 +1161,11 @@ async function importSpotify() {
     if(!id) return notify('Invalid URL');
     notify('Importing...');
     try {
-        const res=await fetch(`${API}/p/${id}`);
+        const res=await fetch(`${API}/s/p/${id}`);
         const raw=await res.json();
-        const items=Array.isArray(raw)?raw:(raw.tracks||raw.items||[]);
+        const items=raw.tracks||[];
         if(!items.length) return notify('No tracks found');
-        const pl={id:Date.now().toString(),name:customName||raw.name||'Spotify Import',tracks:[]};
+        const pl={id:Date.now().toString(),name:customName||raw.title||'Spotify Import',tracks:[]};
         items.forEach(item=>{ const t=item.track||item; if(t&&(t.name||t.title)) { const track = normPl(t); track.source = 'spotify'; pl.tracks.push(track); } });
         playlists.push(pl); savePls(); renderAll(); hideOvs();
         document.getElementById('spot-url').value=''; document.getElementById('spot-name').value='';
@@ -1194,11 +1191,11 @@ async function switchSource() {
     if(!curData) return notify('Nothing playing');
     const track = queue[curIdx];
     const otherSource = curData.source === 'spotify' ? 'soundcloud' : 'spotify';
-    const otherApi = otherSource === 'spotify' ? API : SOUNDCLOUD_API;
     notify(`Trying ${otherSource}...`);
 
     try {
-        const res = await fetch(`${otherApi}/s/${cq(curData.title + ' ' + curData.artist)}`);
+        const ep = otherSource === 'spotify' ? `${API}/s/s/${cq(curData.title+' '+curData.artist)}` : `${API}/c/s/${cq(curData.title+' '+curData.artist)}`;
+        const res = await fetch(ep);
         const raw = await res.json();
         const results = Array.isArray(raw) ? raw : (raw.results || []);
         if(!results.length) return notify(`Not found on ${otherSource}`);
@@ -1207,12 +1204,9 @@ async function switchSource() {
         let newStreamUrl = null;
 
         if(otherSource === 'spotify' && found.spotifyId) {
-            newStreamUrl = `${API}/d/${found.spotifyId}`;
+            newStreamUrl = `${API}/s/d/${found.spotifyId}?fallback=1`;
         } else if(otherSource === 'soundcloud' && found.url) {
-            const slug = found.url.replace(/https?:\/\/soundcloud\.com\//, '');
-            const r2 = await fetch(`${SOUNDCLOUD_API}/d/${slug}`);
-            const d2 = await r2.json();
-            newStreamUrl = d2.streamUrl;
+            newStreamUrl = `${API}/c/d/${found.url.replace(/https?:\/\/soundcloud\.com\//,'')}?fallback=1`;
         }
 
         if(!newStreamUrl) return notify(`Failed on ${otherSource}`);
